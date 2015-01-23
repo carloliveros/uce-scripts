@@ -13,7 +13,7 @@ https://github.com/faircloth-lab/phyluce/blob/master/docs/uce-processing.rst
 Read these pages in conjunction with this document.
 
 ## Outline
--------
+
 1 - Run illumiprocessor.py
 
 2 - Run Velvet to Assemble Contigs for each species
@@ -32,7 +32,6 @@ Read these pages in conjunction with this document.
 
 
 ## STEP 1 - Run illumiprocessor.py
--------------------------------
 
 Create a configuration file for illumiprocessor.py.  This file will tell 
 illumiprocessor.py which index from the sequence reads corresponds to which 
@@ -122,7 +121,6 @@ illumiprocessor runs should be concatenated.
 
 
 ## STEP 2a - Run Velvet to Assemble Contigs for each species
----------------------------------------------------------
 
 For detailed instructions on this step, visit:
 https://github.com/faircloth-lab/phyluce/blob/master/docs/pre-processing-assembly.rst
@@ -151,7 +149,6 @@ directory in the cleaned reads directory.
 
 
 ## STEP 2b - Run Trinity to Assemble Contigs for each species
-----------------------------------------------------------
 
 You will run the python script assemblo_trinity.py to assemble contigs for
 each species.  You need to create a run config file, that tells the script
@@ -172,19 +169,18 @@ Invoke assemblo_trinity.py giving the name of the config file, the name of
 an output path, the name of the subfolder where reads are located, and the 
 number of cores you want the program to run.
 
-$ mkdir trinity-assemblies
+> mkdir trinity-assemblies
 
-XX python ~/phyluce/bin/assembly/assemblo_trinity.py --conf trinity-assemblies.conf --output trinity-assemblies --subfolder 'split-adapter-quality-trimmed' --cores 12 [--clean]
+> python ~/phyluce/bin/assembly/assemblo_trinity.py --conf trinity-assemblies.conf --output trinity-assemblies --subfolder 'split-adapter-quality-trimmed' --cores 12 [--clean]
 
 This should assemble everything in it's own folder in "trinity-assemblies".  
 There will also be a "contigs" folder in that directory that contains 
 symlinks to the contigs that are assembled, named appropriately for the 
-"match_contigs_to_probes.py" script.  The --clean option is optional and is
+`"match_contigs_to_probes.py"` script.  The --clean option is optional and is
 used to clean up unnecessary trinity files that take up a lot of disk space.
 
 
-STEP 3 - Match Probes to Themselves
------------------------------------
+## STEP 3 - Match Probes to Themselves
 
 This step can be skipped if previously done.  Just copy the probe and dupe files
 to your working directory.
@@ -194,35 +190,34 @@ The probes file (LSU-Custom-Array-Jan-2013.fasta) needs to be present in the
 
 Run easy_lastz:
 
-XX  python ~/phyluce/bin/share/easy_lastz.py --target 5472_probes.fasta --query 5472_probes.fasta --output 5472_probes_to_self.fasta --identity 85
+>  python ~/phyluce/bin/share/easy_lastz.py --target 5472_probes.fasta --query 5472_probes.fasta --output 5472_probes_to_self.fasta --identity 85
 
 
-STEP 4 - Extract UCE contigs 
-----------------------------
+## STEP 4 - Extract UCE contigs 
+
 
 Match assembled contigs to self-matched probes and extract the contigs matching 
 UCE probes.  
 
-[OLD VERSION]
-$ match_contigs_to_probes.py /public/uce/work/cleaned-reads/contigs /public/uce/work/LSU-Custom-Array-Jan-2013.fasta /public/uce/work/lastz --regex "_p[1-9]+$" --repl "" --dupefile /public/uce/work/LSU-Custom-Array-Jan-2013-to-self.fasta
+OLD VERSION
+> match_contigs_to_probes.py /public/uce/work/cleaned-reads/contigs /public/uce/work/LSU-Custom-Array-Jan-2013.fasta /public/uce/work/lastz --regex "_p[1-9]+$" --repl "" --dupefile /public/uce/work/LSU-Custom-Array-Jan-2013-to-self.fasta
 
-XX  python ~/phyluce/bin/assembly/match_contigs_to_probes.py --contigs trinity-assemblies/contigs/ --probes 5k-probes.fasta  --dupefile 5k-probes-to-self.fasta --output ./lastz/ --regex "(chr\w+)(?:_probe\d+)"
+> python ~/phyluce/bin/assembly/match_contigs_to_probes.py --contigs trinity-assemblies/contigs/ --probes 5k-probes.fasta  --dupefile 5k-probes-to-self.fasta --output ./lastz/ --regex "(chr\w+)(?:_probe\d+)"
 
 
-STEP 5 - Inspect data using sqlite
-----------------------------------
+## STEP 5 - Inspect data using sqlite
 
 See Brant's github page for more details.  It's all there!
 
 https://github.com/faircloth-lab/phyluce/blob/master/docs/uce-processing.rst
 
 
-STEP 6 - Assemble dataset
--------------------------
+## STEP 6 - Assemble dataset
 
 Create a dataset configuration in a file, e.g. datasets.conf, and save it
 in the working directory.  It should look something like:
 
+```
 [dataset1]
 genus_species1
 genus_species2
@@ -234,31 +229,30 @@ genus_species5
 genus_species4
 genus_species5
 genus_species6
+```
 
+# A. Run a query on the database:
 
-A. Run a query on the database:
-
-XX  python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'trogons' --output trogons.conf --log-path trogons_log
+>  python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'trogons' --output trogons.conf --log-path trogons_log
 
 This will produce a config file listing taxon names from dataset1 as well as a 
 list of loci for which all taxa in the list has data.  If an incomplete data
 matrix is desired, add the flag --incomplete-matrix as below:
 
-XX  python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'trogons' --output trogons.inc.conf --log-path trogons_inc_log --incomplete-matrix
+>  python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'trogons' --output trogons.inc.conf --log-path trogons_inc_log --incomplete-matrix
 
-B. Generate a fasta file for your dataset.
+# B. Generate a fasta file for your dataset.
 
-XX  python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output trogons.conf --output trogons.fasta --log-path trogons_log
+>  python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output trogons.conf --output trogons.fasta --log-path trogons_log
 
 If working with an incomplete data matrix, add the flag --incomplete-matrix and
 the path to an incomplete.nostrict file that will hold missing locus information 
 as below:
 
-XX  python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output trogons.inc.conf --output trogons.inc.fasta --incomplete-matrix trogons.inc.nostrict --log-path trogons_inc_log
+>  python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output trogons.inc.conf --output trogons.inc.fasta --incomplete-matrix trogons.inc.nostrict --log-path trogons_inc_log
 
 
-STEP 7 - Calculate coverage for Trinity-aligned datasets
---------------------------------------------------------
+# STEP 7 - Calculate coverage for Trinity-aligned datasets
 
 For this step you will need:
 - cleaned reads folder that contains a folder for each sample and raw reads 1
