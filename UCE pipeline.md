@@ -100,10 +100,14 @@ mkdir cleaned-reads
 ```
 
 version 2
-> illumiprocessor --input L001/ --output cleaned-reads/ --config illumiprocessor.conf --cores 12
+```
+illumiprocessor --input L001/ --output cleaned-reads/ --config illumiprocessor.conf --cores 12
+```
 
 version 1
-> illumiprocessor.py /public/uce/work/L006/ /public/uce/work/cleaned-reads/ /public/uce/work/preprocess.conf --remap --complex --cores 12
+```
+illumiprocessor.py /public/uce/work/L006/ /public/uce/work/cleaned-reads/ /public/uce/work/preprocess.conf --remap --complex --cores 12
+```
 
 If CBOT was not used in the Illumina sequencing run, you will have to run 
 illumiprocessor.py twice (assuming a rapid run of two lanes).  You will 
@@ -112,15 +116,21 @@ extensions given in the params settings.  Store the output of one run in
 cleaned-reads, and the other in cleaned-reads2.  The outputs of both 
 illumiprocessor runs should be concatenated.
 
-> cd /public/uce/work
-> mkdir cleaned-reads2
-> illumiprocessor.py /public/uce/work/L007/ /public/uce/work/cleaned-reads/ /public/uce/work/preprocess1.conf --remap --complex --cores 12
-> illumiprocessor.py /public/uce/work/L008/ /public/uce/work/cleaned-reads2/ /public/uce/work/preprocess2.conf --remap --complex --cores 12
-> for iter in * ; do cat /public/uce/work/cleaned-reads2/$iter/interleaved-adapter-quality-trimmed/$iter-READ1and2-interleaved.fastq.gz >> /public/uce/work/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ1and2-interleaved.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/work/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; done
-> for iter in * ; do cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; done
+```
+cd /public/uce/work
 
->  $ for iter in * ; do cat /public/uce/aug/cleaned-reads8/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; cat /public/uce/aug/cleaned-reads8/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz; cat /public/uce/aug/cleaned-reads8/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz; done
+mkdir cleaned-reads2
 
+illumiprocessor.py /public/uce/work/L007/ /public/uce/work/cleaned-reads/ /public/uce/work/preprocess1.conf --remap --complex --cores 12
+
+illumiprocessor.py /public/uce/work/L008/ /public/uce/work/cleaned-reads2/ /public/uce/work/preprocess2.conf --remap --complex --cores 12
+
+for iter in * ; do cat /public/uce/work/cleaned-reads2/$iter/interleaved-adapter-quality-trimmed/$iter-READ1and2-interleaved.fastq.gz >> /public/uce/work/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ1and2-interleaved.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/work/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; done
+
+for iter in * ; do cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; done
+
+for iter in * ; do cat /public/uce/aug/cleaned-reads8/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; cat /public/uce/aug/cleaned-reads8/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz; cat /public/uce/aug/cleaned-reads8/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz; done
+```
 
 ## STEP 2a - Run Velvet to Assemble Contigs for each species
 
