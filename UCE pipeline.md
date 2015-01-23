@@ -95,7 +95,9 @@ directory, your config file, and the number of processors to be used.
 
 Navigate to your working directory.
 
-```mkdir cleaned-reads```
+```
+mkdir cleaned-reads
+```
 
 version 2
 > illumiprocessor --input L001/ --output cleaned-reads/ --config illumiprocessor.conf --cores 12
