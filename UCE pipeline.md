@@ -1,6 +1,6 @@
-### UCE BioInformatics Pipeline for Phylogenetic Studies
+# UCE BioInformatics Pipeline for Phylogenetic Studies
 
-# by Carl H. Oliveros
+### by Carl H. Oliveros
 
 Based on:
 
