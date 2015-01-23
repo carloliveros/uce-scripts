@@ -44,6 +44,7 @@ use in the output files (remap section). USE ALL SMALL LETTERS FOR NAMES.
 
 Open a text editor and create the mapping file as follows:
 
+`
 [adapters]
 N7:CTGTCTCTTATACACATCTCCGAGCCCACGAGAC*ATCTCGTATGCCGTCTTCTGCTTG
 N5:CTGTCTCTTATACACATCTGACGCTGCCGACGA*GTGTAGATCTCGGTGGTCGCCGTATCATT
@@ -81,6 +82,7 @@ acryllium-vulturinum:N503,N707
 [remap]
 acryllium_vulturinum_CTCTCTAC-TATCCTCT:acryllium-vulturinum
 
+`
 
 Save the file on the /public/uce/work folder as pre-process.conf.
 
@@ -94,10 +96,10 @@ directory, your config file, and the number of processors to be used.
 
 Navigate to your working directory.
 
-XX mkdir cleaned-reads
+> mkdir cleaned-reads
 
 version 2
-XX illumiprocessor --input L001/ --output cleaned-reads/ --config illumiprocessor.conf --cores 12
+> illumiprocessor --input L001/ --output cleaned-reads/ --config illumiprocessor.conf --cores 12
 
 version 1
 XX illumiprocessor.py /public/uce/work/L006/ /public/uce/work/cleaned-reads/ /public/uce/work/preprocess.conf --remap --complex --cores 12
