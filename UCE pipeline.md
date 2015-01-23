@@ -140,17 +140,17 @@ https://github.com/faircloth-lab/phyluce/blob/master/docs/pre-processing-assembl
 
 Move into the cleaned-reads folder.
 
-'''	
+```	
 cd /public/uce/work/cleaned-reads/
-'''
+```
 
 To run Velvet Optimiser (a wrapper script that determines the best settings for 
 Velvet given your dataset), use the following commands. First, print the names 
 of the cleaned files you will be using.
 
-'''
+```
 VelvetOptimiser.pl --s 69 --e 75 --k=n50 --c=tbp -t 6 -a -f "-fastq.gz -shortPaired $(echo $( ls `*/split-adapter-quality-trimmed/*`-READ?.fastq.gz ) ) -short $(echo $( ls `*/split-adapter-quality-trimmed/*`-READ-singleton.fastq.gz ) )"
-'''
+```
 
 Once you have an idea of the kmer range that will work with your data, run 
 assemblo.py, which will use velvet to assemble contigs for each species.
@@ -159,8 +159,6 @@ assemblo.py, which will use velvet to assemble contigs for each species.
 cd /public/uce/work/
 assemblo.py ./cleaned-reads 71 83 6
 ```
-
-problematic = run with python and full path name of script
 
 In the command above specify the kmer range and the number of processors you 
 want to use.  The resulting contigs (symlinks) will be found in the contigs 
