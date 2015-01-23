@@ -231,7 +231,7 @@ genus_species5
 genus_species6
 ```
 
-# A. Run a query on the database:
+### A. Run a query on the database:
 
 >  python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'trogons' --output trogons.conf --log-path trogons_log
 
@@ -241,7 +241,7 @@ matrix is desired, add the flag --incomplete-matrix as below:
 
 >  python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'trogons' --output trogons.inc.conf --log-path trogons_inc_log --incomplete-matrix
 
-# B. Generate a fasta file for your dataset.
+### B. Generate a fasta file for your dataset.
 
 >  python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output trogons.conf --output trogons.fasta --log-path trogons_log
 
@@ -252,7 +252,7 @@ as below:
 >  python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output trogons.inc.conf --output trogons.inc.fasta --incomplete-matrix trogons.inc.nostrict --log-path trogons_inc_log
 
 
-# STEP 7 - Calculate coverage for Trinity-aligned datasets
+## STEP 7 - Calculate coverage for Trinity-aligned datasets
 
 For this step you will need:
 - cleaned reads folder that contains a folder for each sample and raw reads 1
@@ -268,38 +268,40 @@ coverage will be calculated for all enriched loci).
 The following commands will help you copy the needed files from your cleaned-
 reads folder and trinity-assemblies folder to the cluster.
 
-$ mkdir trogons_clean
-$ dest=/media/Dicrurus/uce/trogons_clean
-$ [cd to cleaned reads folder]
-$ for i in apalharpactes_mackloti_b49104 apaloderma_aequatoriale_8461 euptilotis_neoxenus_prs2606 harpactes_ardens_26958 harpactes_erythrocephalus_9970 harpactes_oreskios_23185 pharomachrus_antisianus_b22870 priotelus_roseigaster_6363 priotelus_temnurus_5565 trogon_personatus_gfb2125 trogon_violaceus_rop258 ceyx_argentata_19269 otus_elegans_10975; do mkdir $dest/$i ; mkdir $dest/$i/split-adapter-quality-trimmed; cp $i/split-adapter-quality-trimmed/*READ?.fastq.gz $dest/$i/split-adapter-quality-trimmed; done;
+> mkdir trogons_clean
+> dest=/media/Dicrurus/uce/trogons_clean
+> [cd to cleaned reads folder]
+> for i in apalharpactes_mackloti_b49104 apaloderma_aequatoriale_8461 euptilotis_neoxenus_prs2606 harpactes_ardens_26958 harpactes_erythrocephalus_9970 harpactes_oreskios_23185 pharomachrus_antisianus_b22870 priotelus_roseigaster_6363 priotelus_temnurus_5565 trogon_personatus_gfb2125 trogon_violaceus_rop258 ceyx_argentata_19269 otus_elegans_10975; do mkdir $dest/$i ; mkdir $dest/$i/split-adapter-quality-trimmed; cp $i/split-adapter-quality-trimmed/*READ?.fastq.gz $dest/$i/split-adapter-quality-trimmed; done;
 
-$ mkdir trogons_trinity
-$ dest=/media/Dicrurus/uce/trogons_trinity
-$ [cd to trinity assemblies folder]
-$ for i in apalharpactes_mackloti_b49104 apaloderma_aequatoriale_8461 euptilotis_neoxenus_prs2606 harpactes_ardens_26958 harpactes_erythrocephalus_9970 harpactes_oreskios_23185 pharomachrus_antisianus_b22870 priotelus_roseigaster_6363 priotelus_temnurus_5565 trogon_personatus_gfb2125 trogon_violaceus_rop258 ceyx_argentata_19269 otus_elegans_10975; do mkdir $dest/$i ; cp -L $i/contigs.fasta $dest/$i; done;
+> mkdir trogons_trinity
+> dest=/media/Dicrurus/uce/trogons_trinity
+> [cd to trinity assemblies folder]
+> for i in apalharpactes_mackloti_b49104 apaloderma_aequatoriale_8461 euptilotis_neoxenus_prs2606 harpactes_ardens_26958 harpactes_erythrocephalus_9970 harpactes_oreskios_23185 pharomachrus_antisianus_b22870 priotelus_roseigaster_6363 priotelus_temnurus_5565 trogon_personatus_gfb2125 trogon_violaceus_rop258 ceyx_argentata_19269 otus_elegans_10975; do mkdir $dest/$i ; cp -L $i/contigs.fasta $dest/$i; done;
 
-Use the following command in your PBS script
+Use the following commands in your PBS script:
 
-A. Calculate coverage for all contigs
+To calculate coverage for all contigs:
 
-XX python /scratch/oliveros/phyluce/bin/assembly/get_trinity_coverage.py --assemblies /scratch/oliveros/trogons/trogons_trinity/ --assemblo-config /scratch/oliveros/trogons/trinity.conf --cores 4 --subfolder 'split-adapter-quality-trimmed' --log-path /scratch/oliveros/trogons/trogons_covlog/
+> python /scratch/oliveros/phyluce/bin/assembly/get_trinity_coverage.py --assemblies /scratch/oliveros/trogons/trogons_trinity/ --assemblo-config /scratch/oliveros/trogons/trinity.conf --cores 4 --subfolder 'split-adapter-quality-trimmed' --log-path /scratch/oliveros/trogons/trogons_covlog/
 
-B. Calculate coverage for UCE contigs.  This module is ok to run on a single processor interactive session:
-XX python /scratch/oliveros/phyluce/bin/assembly/get_trinity_coverage_for_uce_loci.py --assemblies /scratch/oliveros/trogons/trogons_trinity/ --match-count-output /scratch/oliveros/trogons/trogons.inc.conf --locus-db /scratch/oliveros/trogons/probe.matches.sqlite --output /scratch/oliveros/trogons/trogons_coverage --log-path /scratch/oliveros/trogons/trogons_covlog/
+To calculate coverage for UCE contigs.  This module is ok to run on a single processor interactive session:
+> python /scratch/oliveros/phyluce/bin/assembly/get_trinity_coverage_for_uce_loci.py --assemblies /scratch/oliveros/trogons/trogons_trinity/ --match-count-output /scratch/oliveros/trogons/trogons.inc.conf --locus-db /scratch/oliveros/trogons/probe.matches.sqlite --output /scratch/oliveros/trogons/trogons_coverage --log-path /scratch/oliveros/trogons/trogons_covlog/
 
- ** *.jar paths hardcoded in /phyluce/bwa.py
- ** add /scratch/oliveros/phyluce/:/scratch/oliveros/biopython-1.64 to PYTHONPATH
+`*.jar` paths hardcoded in /phyluce/bwa.py
+
+Add /scratch/oliveros/phyluce/:/scratch/oliveros/biopython-1.64 to PYTHONPATH
 
 Summarizing output:
-cat get_trinity_coverage.log | grep 'Processing\|mean coverage' | sed -r 's/.+Processing (\w+).+/\1/' | sed -r 's/.+INFO -\s+([0-9]+) contigs, mean coverage = ([0-9]+\.[0-9]), mean length = ([0-9]+\.[0-9])/\1\t\2\t\3/' | sed '$!N;s/\n/\t/' 
 
-cat get_trinity_coverage_for_uce_loci.log | grep 'Processing\|mean trimmed coverage' | sed -r 's/.+Processing (\w+).+/\1/' | sed -r 's/.+INFO -\s+([0-9]+) contigs, mean trimmed length = ([0-9]+\.[0-9]), mean trimmed coverage = ([0-9]+\.[0-9])x, on-target bases \(uce contigs\) = ([0-9]+\.[0-9])%, unique reads aligned \(all contigs\) = ([0-9]+\.[0-9])%/\1\t\2\t\3\t\4\t\5/' | sed '$!N;s/\n/\t/'
+> cat get_trinity_coverage.log | grep 'Processing\|mean coverage' | sed -r 's/.+Processing (\w+).+/\1/' | sed -r 's/.+INFO -\s+([0-9]+) contigs, mean coverage = ([0-9]+\.[0-9]), mean length = ([0-9]+\.[0-9])/\1\t\2\t\3/' | sed '$!N;s/\n/\t/' 
+
+> cat get_trinity_coverage_for_uce_loci.log | grep 'Processing\|mean trimmed coverage' | sed -r 's/.+Processing (\w+).+/\1/' | sed -r 's/.+INFO -\s+([0-9]+) contigs, mean trimmed length = ([0-9]+\.[0-9]), mean trimmed coverage = ([0-9]+\.[0-9])x, on-target bases \(uce contigs\) = ([0-9]+\.[0-9])%, unique reads aligned \(all contigs\) = ([0-9]+\.[0-9])%/\1\t\2\t\3\t\4\t\5/' | sed '$!N;s/\n/\t/'
 
 run time (refine this)
-cat get_trinity_coverage.log | grep 'Processing\|Completed' |sed -r 's/(.+) (.+),.+/\1\t\2/'
+
+> cat get_trinity_coverage.log | grep 'Processing\|Completed' |sed -r 's/(.+) (.+),.+/\1\t\2/'
  
-STEP 8 - Sequence alignment
----------------------------
+## STEP 8 - Sequence alignment
 
 A. Align the dataset.  The following script will create aligned nexus files by
 locus.
