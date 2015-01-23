@@ -44,7 +44,7 @@ use in the output files (remap section). USE ALL SMALL LETTERS FOR NAMES.
 
 Open a text editor and create the mapping file as follows:
 
-`
+```
 [adapters]
 N7:CTGTCTCTTATACACATCTCCGAGCCCACGAGAC*ATCTCGTATGCCGTCTTCTGCTTG
 N5:CTGTCTCTTATACACATCTGACGCTGCCGACGA*GTGTAGATCTCGGTGGTCGCCGTATCATT
@@ -82,7 +82,7 @@ acryllium-vulturinum:N503,N707
 [remap]
 acryllium_vulturinum_CTCTCTAC-TATCCTCT:acryllium-vulturinum
 
-`
+```
 
 Save the file on the /public/uce/work folder as pre-process.conf.
 
