@@ -1,6 +1,6 @@
-UCE BioInformatics Pipeline for Phylogenetic Studies
+### UCE BioInformatics Pipeline for Phylogenetic Studies
 
-by Carl H. Oliveros
+# by Carl H. Oliveros
 
 Based on:
 
@@ -12,19 +12,26 @@ https://github.com/faircloth-lab/phyluce/blob/master/docs/uce-processing.rst
 
 Read these pages in conjunction with this document.
 
-Outline
+## Outline
 -------
 1 - Run illumiprocessor.py
+
 2 - Run Velvet to Assemble Contigs for each species
+
 3 - Match Probes to Themselves
+
 4 - Extract UCE contigs 
+
 5 - Inspect data using sqlite
+
 6 - Assemble dataset
+
 7 - Sequence alignment
+
 8 - Format data for phylogenetic analysis
 
 
-STEP 1 - Run illumiprocessor.py
+## STEP 1 - Run illumiprocessor.py
 -------------------------------
 
 Create a configuration file for illumiprocessor.py.  This file will tell 
