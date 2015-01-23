@@ -3,8 +3,11 @@ UCE BioInformatics Pipeline for Phylogenetic Studies
 by Carl H. Oliveros
 
 Based on:
+
 https://github.com/faircloth-lab/phyluce/blob/master/docs/pre-processing-qc.rst
+
 https://github.com/faircloth-lab/phyluce/blob/master/docs/pre-processing-assembly.rst
+
 https://github.com/faircloth-lab/phyluce/blob/master/docs/uce-processing.rst
 
 Read these pages in conjunction with this document.
