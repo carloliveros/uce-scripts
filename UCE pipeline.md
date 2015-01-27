@@ -350,14 +350,15 @@ cat get_trinity_coverage.log | grep 'Processing\|Completed' |sed -r 's/(.+) (.+)
 
 ## STEP 8 - Sequence alignment
 
-### A. Align the dataset.  The following script will create aligned nexus files by
-locus.
+### A. Align the dataset.  
+
+The following script will create aligned nexus files by locus.
 
 ```
 python ~/phyluce/bin/align/seqcap_align_2.py --fasta trogons.fasta --output trogons_aligned --output-format fasta --taxa 71 --aligner mafft --cores 12 --log-path trogons_log
 ```
 
-If working with an incomplete matrix:
+If working with an incomplete matrix, perform the three steps:
 
 1.  Perform alignment as above but add the flag --incomplete-matrix:
 
