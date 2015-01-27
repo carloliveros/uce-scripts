@@ -30,9 +30,11 @@ Read these pages in conjunction with this document.
 
 8 - Format data for phylogenetic analysis
 
-
-
 ## STEP 1 - Run illumiprocessor.py
+
+The illumiprocessor python script trims adapter contamination and performs 
+quality checking of reads. Create a folder in your work folder and copy all raw
+read files in that folder.
 
 Create a configuration file for illumiprocessor.py.  This file will tell 
 illumiprocessor.py which index from the sequence reads corresponds to which 
@@ -86,19 +88,14 @@ acryllium_vulturinum_CTCTCTAC-TATCCTCT:acryllium-vulturinum
 
 Save the file on the /public/uce/work folder as pre-process.conf.
 
-The illumiprocessor python script trims adapter contamination and performs 
-quality checking of reads. Create a folder in your work folder and copy all raw
-read files in that folder.
-
-In the command line, call the program and insert arguments for the input (the 
-folder containing raw reads), the output 
-directory, your config file, and the number of processors to be used. 
-
-Navigate to your working directory.
+Navigate to your working directory and create a directory that will contain the output.
 
 ```
 mkdir cleaned-reads
 ```
+
+Call the program and insert arguments for the input (the folder containing raw reads),
+the output directory, your config file, and the number of processors to be used. 
 
 version 2
 ```
@@ -133,39 +130,11 @@ for iter in * ; do cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quali
 for iter in * ; do cat /public/uce/aug/cleaned-reads8/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; cat /public/uce/aug/cleaned-reads8/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz; cat /public/uce/aug/cleaned-reads8/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz; done
 ```
 
-## STEP 2a - Run Velvet to Assemble Contigs for each species
+## STEP 2 - Assemble reads into contigs
 
-For detailed instructions on this step, visit:
-https://github.com/faircloth-lab/phyluce/blob/master/docs/pre-processing-assembly.rst
+In this step, you could use Trinity (preferred) or Velvet.
 
-Move into the cleaned-reads folder.
-
-```	
-cd /public/uce/work/cleaned-reads/
-```
-
-To run Velvet Optimiser (a wrapper script that determines the best settings for 
-Velvet given your dataset), use the following commands. First, print the names 
-of the cleaned files you will be using.
-
-```
-VelvetOptimiser.pl --s 69 --e 75 --k=n50 --c=tbp -t 6 -a -f "-fastq.gz -shortPaired $(echo $( ls `*/split-adapter-quality-trimmed/*`-READ?.fastq.gz ) ) -short $(echo $( ls `*/split-adapter-quality-trimmed/*`-READ-singleton.fastq.gz ) )"
-```
-
-Once you have an idea of the kmer range that will work with your data, run 
-assemblo.py, which will use velvet to assemble contigs for each species.
-
-```
-cd /public/uce/work/
-assemblo.py ./cleaned-reads 71 83 6
-```
-
-In the command above specify the kmer range and the number of processors you 
-want to use.  The resulting contigs (symlinks) will be found in the contigs 
-directory in the cleaned reads directory.
-
-
-## STEP 2b - Run Trinity to Assemble Contigs for each species
+### 2a - Run Trinity to Assemble Contigs for each species
 
 You will run the python script assemblo_trinity.py to assemble contigs for
 each species.  You need to create a run config file, that tells the script
@@ -201,13 +170,42 @@ symlinks to the contigs that are assembled, named appropriately for the
 used to clean up unnecessary trinity files that take up a lot of disk space.
 
 
+### 2b - Run Velvet to Assemble Contigs for each species
+
+For detailed instructions on this step, visit:
+https://github.com/faircloth-lab/phyluce/blob/master/docs/pre-processing-assembly.rst
+
+Move into the cleaned-reads folder.
+
+```	
+cd /public/uce/work/cleaned-reads/
+```
+
+To run Velvet Optimiser (a wrapper script that determines the best settings for 
+Velvet given your dataset), use the following commands. First, print the names 
+of the cleaned files you will be using.
+
+```
+VelvetOptimiser.pl --s 69 --e 75 --k=n50 --c=tbp -t 6 -a -f "-fastq.gz -shortPaired $(echo $( ls `*/split-adapter-quality-trimmed/*`-READ?.fastq.gz ) ) -short $(echo $( ls `*/split-adapter-quality-trimmed/*`-READ-singleton.fastq.gz ) )"
+```
+
+Once you have an idea of the kmer range that will work with your data, run 
+assemblo.py, which will use velvet to assemble contigs for each species.
+
+```
+cd /public/uce/work/
+assemblo.py ./cleaned-reads 71 83 6
+```
+
+In the command above specify the kmer range and the number of processors you 
+want to use.  The resulting contigs (symlinks) will be found in the contigs 
+directory in the cleaned reads directory.
+
+
 ## STEP 3 - Match Probes to Themselves
 
 This step can be skipped if previously done.  Just copy the probe and dupe files
 to your working directory.
-
-The probes file (LSU-Custom-Array-Jan-2013.fasta) needs to be present in the 
-/public/uce/work directory.
 
 Run easy_lastz:
 
@@ -393,7 +391,9 @@ If working with an incomplete matrix:
 python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments trogons_inc_min_75percent_with_missing --output trogons_inc_min_75percent_gbtrimmed --b2 0.65 --cores 12 --log-path trogons_inc_log 
 ```
 
-### C. You can get summary stats from your aligned dataset.
+### C. Summary stats
+
+You can get summary stats from your aligned dataset.
 
 ```
 python ~/phyluce/bin/align/get_align_summary_data.py --alignments trogons_gbtrimmed --input-format nexus --cores 12 --log-path trogons_log
@@ -405,7 +405,9 @@ If working with an incomplete matrix:
 python ~/phyluce/bin/align/get_align_summary_data.py --alignments trogons_inc_min_75percent_gbtrimmed --input-format nexus --cores 12 --log-path trogons_inc_log
 ```
 
-### D. Screen alignments for bases that are not in the set of IUPAC base codes.
+### D. Screen alignments
+
+Screen alignments for bases that are not in the set of IUPAC base codes.
 
 ```
 python ~/phyluce/bin/align/screen_alignments_for_problems.py --alignments trogons_gbtrimmed --input-format nexus --output trogons_screened  --cores 12 --log-path trogons_log
@@ -419,7 +421,9 @@ If working with an incomplete matrix:
 python ~/phyluce/bin/align/screen_alignments_for_problems.py --alignments trogons_inc_min_75percent_gbtrimmed --input-format nexus --output trogons_inc_min_75percent_screened  --cores 12 --log-path trogons_inc_log
 ```
 
-### E. After inspecting individual alignments, remove loci names from the taxon names in
+### E. Remove loci names from the taxon names
+
+After inspecting individual alignments, remove loci names from the taxon names in
 the nexus files.
 
 ```
@@ -443,8 +447,7 @@ The dataset is ready for phylogenetic analysis.
 ## STEP 9 - Formatting data for phylogenetic analysis
 
 For PHYLIP, PhyML, and CloudForest (also MrBayes, since we will need CloudForest's
-models info) convert the dataset into strict phylip format.  To keep taxon names 
-consistent between analyses, use the strict phylip format for RAxML as well.
+models info) convert the dataset into strict phylip format.
 
 ```
 python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_renamed/ --output trogons_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path trogons_log
@@ -452,7 +455,7 @@ python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_r
 
 If you do not specify --shorten-names, program will take first 10 characters of name.  Consider using `rename_taxa_from_nexus_lines.py`
 
-(INCOMPLETE MARTRIX)
+If working with an incomplete matrix:
 
 ```
 python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_inc_min_75percent_renamed/ --output trogons_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path trogons_inc_log
@@ -464,7 +467,7 @@ Convert the dataset back to nexus if you wish to have the same short taxon name 
 python ~/phyluce/bin/align/convert_one_align_to_another.py --alignments trogons_phylip/ --output trogons_nexus/ --input-format phylip --output-format nexus --cores 12 --log-path trogons_log
 ```
 
-(INCOMPLETE MARTRIX)
+If working with an incomplete matrix:
 
 ```
 python ~/phyluce/bin/align/convert_one_align_to_another.py --alignments trogons_inc_min_75percent_phylip/ --output trogons_inc_min_75percent_nexus/ --input-format phylip --output-format nexus --cores 12 --log-path trogons_inc_log
@@ -476,7 +479,7 @@ Format the dataset for RAxML analysis.
 python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_renamed/ --output trogons_raxml --log-path trogons_log
 ```
 
-(INCOMPLETE MARTRIX)
+If working with an incomplete matrix:
 
 ```
 python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_inc_min_75percent_renamed/ --output trogons_inc_min_75percent_raxml --log-path trogons_inc_log
@@ -492,7 +495,7 @@ python ~/CloudForest/cloudforest/cloudforest_mpi.py trogons_phylip/ trogons_clou
 python /tools/cluster/6.2/cloudforest/0.1/scripts/cloudforest_mpi.py trogons_phylip/ trogons_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 12
 ```
 
-(INCOMPLETE MARTRIX)
+If working with an incomplete matrix:
 
 ```
 mkdir trogons_inc_min_75percent_cloudforest
@@ -512,7 +515,7 @@ python ~/CloudForest/cloudforest/cloudforest_mpi.py trogons_inc_min_75percent_ph
 unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/oliveros/trogons/trogons_phylip/ /scratch/oliveros/trogons/trogons_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/oliveros/trogons/trogons.cf.gt.out
 ```
 
-(on the Cluster, INCOMPLETE MATRIX)
+(on the Cluster, INCOMPLETE MATRIX)If working with an incomplete matrix:
 
 ```
 #PBS -N trogons.cf.gt
@@ -531,7 +534,7 @@ Strip the models from CloudForest output.
 python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_cloudforest/genetrees.tre --output trogons.models.txt
 ```
 
-(INCOMPLETE MARTRIX)
+If working with an incomplete matrix:
 
 ```
 python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_inc_min_75percent_cloudforest/genetrees.tre --output trogons.inc.min.75percent.models.txt
@@ -546,7 +549,7 @@ is *.nexus whereas `format_nexus_files_for_mrbayes.py` expects *.nex.
 python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_renamed/ --models trogons.models.txt --output trogons.mrbayes.nex --unlink
 ```
 
-(INCOMPLETE MARTRIX)
+If working with an incomplete matrix:
 
 ```
 python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_inc_min_75percent_renamed/ --models trogons.inc.min.75percent.models.txt --output trogons.inc.min.75percent.mrbayes.nex --unlink
