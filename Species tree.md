@@ -6,7 +6,7 @@ INSTALLING R PACKAGE FROM SOURCE
 install.packages("file_name_and_path", repos = NULL, type="source")
 ```
 
-Where file_name_and_path would represent the full path and file name. 
+Where `file_name_and_path` would represent the full path and file name of the package. 
 
 
 ## 1. Prepare bootstrap replicates
@@ -178,8 +178,7 @@ for i in zosterops.stst.???; do qsub $i; done
 
 ## 4. ASTRAL
 
-Create ASTRAL Run Files (cluster)
-=================================
+Create ASTRAL run files
 
 ```
 interval<-50  #indicate interval here
@@ -221,19 +220,27 @@ for i in zosterops.ast.???; do qsub $i; done
 
 Collecting ASTRAL run times
 
-This assumes you have saved Astral output in files named *.astral.out
-Before saving this to a file, good idea to pipe it to wc to check that you
-# have that correct number of run times.
+This assumes you have saved Astral output in files named *.astral.out.
+Before saving this to a file, it's good idea to pipe it to wc to check that you
+have that correct number of run times.
 
+```
 cat $(echo $(ls *.astral.out)) | grep "Optimal tree" | sed -e 's/Optimal tree inferred in //' -e 's/ secs//' > astral.runtimes.txt
+```
+
+## 5 MP-EST
 
 Create MPEST Control Files
-==========================
 
-# Creating species-allele table from Astral output:
+Here's how you can create a species-allele table from Astral output:
+
+```
 cat boot000.phy.astral.out |grep "Taxa" |sed 's/Taxa: //'|sed -r 's/(\w+)/\1 1 \1\n/g' |sed 's/, //' | tr '[]' '\n'
+```
 
+Paste the appropriate species-allele table in the R script below.
 
+```
 nsim<-499  # number of replicates - 1
 ntaxa<-50  # number of taxa
 ngenes<-979  # number of genes
@@ -298,13 +305,11 @@ for(i in 0:nsim)
 	a<-paste(treefile,"0",b,paste(ngenes, ntaxa),c ,"0",sep="\n")  # contents of control file including num genetrees and num species
 	write.table(a, file,row.names=F,col.names=F,quote=F)
 }
+```
 
-To run from the shell:
-for iter in control4*; do echo $iter; mpest $iter; done ;
+Create MP-EST run files
 
-Create MPEST Run Files (cluster)
-================================
-
+```
 interval<-1  #indicate interval here
 numbers<-seq(from=0,to=499,by=interval)  #indicate start, end here
 #numbers<-c(9,28,89,109,129,189,248,288,308,348,369,468,489)
@@ -333,27 +338,43 @@ for(i in numbers)
 	a<-paste(pbsn,pbs,pbsd,pbso,comlist,sep="\n")
 	write.table(a,runfile, row.names=F,col.names=F,quote=F)
 }
+```
 
-# Submit MPEST jobs to cluster
+Submit MP-EST jobs to cluster
 
+```
 for iter in zosterops.mpest.*; do qsub $iter; done
+```
 
-# Monitor MPEST progress
+Monitor MP-EST progress
+
+```
 cat *.rooted.tre | grep " tree mpest" | wc
-# Collect all MPEST trees
+```
+
+Collect all MP-EST trees
+
+```
 cat *.rooted.tre | grep " tree mpest" > summary
-# Create nexus file with all trees
+```
+
+Create nexus file with all trees
+
+```
 cat zhead summary ztail > mpest.all.tre
+```
 
 Note:  Make zhead and ztail from nexus headers and tail of each output file.
 
-Collect MPEST run times
-========================
-# This assumes you have saved MPEST output in files named *rooted.tre
-# Before saving this to a file, good idea to pipe it to wc to check that you
-# have that correct number of run times.
+Collect MP-EST run times
 
+This assumes you have saved MPEST output in files named *rooted.tre
+Before saving this to a file, good idea to pipe it to wc to check that you
+have that correct number of run times.
+
+```
 cat $(echo $(ls *rooted.tre)) | grep "Analysis completed" | sed -e 's/\[Analysis completed in //' -e 's/ seconds\]//' > mpest.runtimes.txt
+```
 
 DENDROPY
 ========
@@ -362,9 +383,9 @@ sumtrees.py -f 0.95 -o star.con.tre treefiles
 
 
 
-FOR DOING ABOVE ON THE REAL GENE TREES
-======================================
+## 6. Running STAR, STEAC, ASTRAL, MP-EST on original data
 
+```
 library("phybase")
 # clean up phylip file
 temp<-read.tree(file="genetrees.tre")  
@@ -412,27 +433,29 @@ diag(species.structure)<-1
 print("Estimating STEAC tree")
 steac<-steac.sptree(treesrooted, speciesname, taxaname, species.structure, outgroup=outgrouptaxon,method="nj")
 write.table(steac,"genetrees.steac.tre",row.names=F,col.names=F,quote=F,append=TRUE)
+```
 
-# ASTRAL
+ASTRAL and MPEST need to be run from the command line.
+
+```
 java -jar /public/uce/Astral/astral.4.4.0.jar -i genetrees.phy -o genetrees.astral.tre 2>&1 | tee genetrees.phy.astral.out
 
+mpest control
+```
+
+## Miscellaneous stuff
 
 Getting frequencies of splits with Dendropy
-===========================================
 
->>> import dendropy
->>> trees=dendropy.TreeList()
->>> split_leaves = ['ZosMad', 'ZosEry', 'ZosGri']
->>> f = trees.frequency_of_split(labels=split_leaves)
->>> print('Frequency of split %s: %s' % (split_leaves, f))
+```
+import dendropy
+trees=dendropy.TreeList()
+split_leaves = ['ZosMad', 'ZosEry', 'ZosGri']
+f = trees.frequency_of_split(labels=split_leaves)
+print('Frequency of split %s: %s' % (split_leaves, f))
 Frequency of split ['ZosMad', 'ZosEry', 'ZosGri']: 0.342153846154
->>> split_leaves1 = ['ZosMad', 'ZosEry', 'ZosGri', 'SpeMel']
->>> f1 = trees.frequency_of_split(labels=split_leaves1)
->>> print('Frequency of split %s: %s' % (split_leaves1, f1))
+split_leaves1 = ['ZosMad', 'ZosEry', 'ZosGri', 'SpeMel']
+f1 = trees.frequency_of_split(labels=split_leaves1)
+print('Frequency of split %s: %s' % (split_leaves1, f1))
 Frequency of split ['ZosMad', 'ZosEry', 'ZosGri', 'SpeMel']: 0.161230769231
->>>
-
-Checking which nodes are allocated to your jobs
-===============================================
-sed -n '/Allocated Nodes/{n;p;}' logfile
-awk '/Allocated Nodes/{getline; print}' logfile
+```
