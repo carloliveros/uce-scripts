@@ -11,7 +11,7 @@ Where file_name_and_path would represent the full path and file name.
 
 ## 1. Prepare bootstrap replicates
 
-# split output from cloudforest
+Split output from cloudforest
 
 split --lines=1933 --suffix-length=3 -d 500-bootreps.tre boot
 
@@ -93,7 +93,7 @@ To submit jobs to cluster:
 for i in zosterops.root.???; do qsub $i; done
 ```
 
-## 3. Run STAR and STEAC
+## 3. STAR and STEAC
 
 Create STAR/STEAC R scripts
 
@@ -176,12 +176,12 @@ To submit jobs to cluster:
 for i in zosterops.stst.???; do qsub $i; done
 ```
 
+## 4. ASTRAL
 
 Create ASTRAL Run Files (cluster)
 =================================
 
-# numbers<-c(040,060,080,140,160,180,240,260,280,340,360,380,440,460,480)
-
+```
 interval<-50  #indicate interval here
 numbers<-seq(from=0,to=450,by=interval)  #indicate start, end here
 astralcom<-"unbuffer java -jar /scratch/oliveros/Astral/astral.4.4.0.jar"
@@ -211,25 +211,18 @@ for(i in numbers)
 	a<-paste(pbsn,pbs,pbsd,comlist,sep="\n")
 	write.table(a,runfile, row.names=F,col.names=F,quote=F)	
 }
+```
 
-# To submit jobs to cluster:
+To submit jobs to cluster:
+
+```
 for i in zosterops.ast.???; do qsub $i; done
+```
 
+Collecting ASTRAL run times
 
-Running ASTRAL from Shell
-=========================
-for iter in boot*.phy; do echo $iter; java -jar /public/uce/Astral/astral.4.4.0.jar -i $iter -o $iter.astral.tre 2>&1 | tee $iter.astral.out; done ;
-
-# collect all trees in one file
-cat boot*.phy.astral.tre > astral.500boot.tre
-rm boot*.phy.astral.tre
-
-java -jar /public/uce/Astral/astral.4.4.0.jar -i /media/Dicrurus/uce/zosterops/zosterops_cloudforest/genetrees.tre -o /media/Dicrurus/uce/zosterops/zosterops_cloudforest/astral.tre
-
-Collect ASTRAL run times
-========================
-# This assumes you have saved Astral output in files named *.astral.out
-# Before saving this to a file, good idea to pipe it to wc to check that you
+This assumes you have saved Astral output in files named *.astral.out
+Before saving this to a file, good idea to pipe it to wc to check that you
 # have that correct number of run times.
 
 cat $(echo $(ls *.astral.out)) | grep "Optimal tree" | sed -e 's/Optimal tree inferred in //' -e 's/ secs//' > astral.runtimes.txt
