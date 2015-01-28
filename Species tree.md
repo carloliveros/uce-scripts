@@ -1,13 +1,6 @@
 # Species tree analysis pipeline
 
-INSTALLING R PACKAGE FROM SOURCE
-
-```
-install.packages("file_name_and_path", repos = NULL, type="source")
-```
-
-Where `file_name_and_path` would represent the full path and file name of the package. 
-
+### by Carl H. Oliveros
 
 ## 1. Prepare bootstrap replicates
 
@@ -437,6 +430,14 @@ mpest control
 ```
 
 ## Miscellaneous stuff
+
+Installing R package from source
+
+```
+install.packages("file_name_and_path", repos = NULL, type="source")
+```
+
+Where `file_name_and_path` would represent the full path and file name of the package. 
 
 Summarizing trees with Dendropy
 
