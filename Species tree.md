@@ -246,20 +246,21 @@ Before saving this to a file, it's good idea to pipe it to wc to check that you
 have that correct number of run times.
 
 ```
-cat $(echo $(ls *.astral.out)) | grep "Optimal tree" | sed -e 's/Optimal tree inferred in //' -e 's/ secs//' > astral.runtimes.txt
+cat `ls *.astral.out` | grep "Optimal tree" | sed -e 's/Optimal tree inferred in //' -e 's/ secs//' > astral.runtimes.txt
 ```
 
 ## 5 MP-EST
 
 Create MPEST Control Files
 
-Here's how you can create a species-allele table from Astral output:
+Here's how you can create a species-allele table from Astral output from the command line:
 
 ```
 cat boot000.phy.astral.out |grep "Taxa" |sed 's/Taxa: //'|sed -r 's/(\w+)/\1 1 \1\n/g' |sed 's/, //' | tr '[]' '\n'
 ```
 
-Paste the appropriate species-allele table in the R script below.
+Paste the appropriate species-allele table in the R script below.  Enter the appropriate number 
+of taxa and number of genes.  The following R script 
 
 ```
 nsim<-499  # number of replicates - 1
@@ -328,7 +329,7 @@ for(i in 0:nsim)
 }
 ```
 
-Create MP-EST run files
+The following R script creates MP-EST job script files for the cluster.
 
 ```
 interval<-1  #indicate interval here
@@ -361,16 +362,10 @@ for(i in numbers)
 }
 ```
 
-Submit MP-EST jobs to cluster
+Submit MP-EST jobs to cluster:
 
 ```
 for iter in zosterops.mpest.*; do qsub $iter; done
-```
-
-Monitor MP-EST progress
-
-```
-cat *.rooted.tre | grep " tree mpest" | wc
 ```
 
 Collect all MP-EST trees
@@ -398,6 +393,8 @@ cat $(echo $(ls *rooted.tre)) | grep "Analysis completed" | sed -e 's/\[Analysis
 ```
 
 ## 6. Running STAR, STEAC, ASTRAL, MP-EST on original data
+
+The following R script performs Steps 2 and 3 above on the original data.  Run the script in the same directory as your Cloudforest output directory (e.g., ./zosterops_cloudforest/) where the genetrees.tre file is saved.
 
 ```
 library("phybase")
@@ -467,6 +464,15 @@ install.packages("file_name_and_path", repos = NULL, type="source")
 
 Where `file_name_and_path` would represent the full path and file name of the package. 
 
+Monitoring progress of STAR, STEAC, ASTRAL, and MP-EST runs
+
+```
+ls boot???.star.tre | wc -l
+ls boot???.steac.tre | wc -l
+ls boot???.phy.astral.tre | wc -l
+cat boot???.rooted.tre | grep "tree mpest" | wc -l
+```
+
 Summarizing trees with Dendropy
 
 ```
@@ -474,7 +480,7 @@ sumtrees.py -o upgma.tre treefiles
 sumtrees.py -f 0.95 -o star.con.tre treefiles
 ```
 
-Getting frequencies of splits with Dendropy
+Getting frequencies of splits with Dendropy from the Python interpreter
 
 ```
 import dendropy
@@ -482,9 +488,12 @@ trees=dendropy.TreeList()
 split_leaves = ['ZosMad', 'ZosEry', 'ZosGri']
 f = trees.frequency_of_split(labels=split_leaves)
 print('Frequency of split %s: %s' % (split_leaves, f))
-Frequency of split ['ZosMad', 'ZosEry', 'ZosGri']: 0.342153846154
+
+      Frequency of split ['ZosMad', 'ZosEry', 'ZosGri']: 0.342153846154
+      
 split_leaves1 = ['ZosMad', 'ZosEry', 'ZosGri', 'SpeMel']
 f1 = trees.frequency_of_split(labels=split_leaves1)
 print('Frequency of split %s: %s' % (split_leaves1, f1))
-Frequency of split ['ZosMad', 'ZosEry', 'ZosGri', 'SpeMel']: 0.161230769231
+
+      Frequency of split ['ZosMad', 'ZosEry', 'ZosGri', 'SpeMel']: 0.161230769231
 ```
