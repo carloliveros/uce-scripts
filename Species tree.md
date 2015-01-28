@@ -2,15 +2,41 @@
 
 ### by Carl H. Oliveros
 
+Perform the following steps in a working directory such as /scratch/oliveros/zosterops/zosterops_speciestree.
+
 ## 1. Prepare bootstrap replicates
 
-Split output from cloudforest
+Split output from cloudforest.
 
+```
 split --lines=1933 --suffix-length=3 -d 500-bootreps.tre boot
+```
+
+The --lines argument contains the number of loci in your dataset.  500-bootreps.tre should contain all the genetrees from the bootstrapped data, i.e.,  assuming your dataset has L loci and N bootstrap replicates, the file should contain:
+
+```
+genetree_from_locus1_of_bootstrap1
+genetree_from_locus2_of_bootstrap1
+...
+genetree_from_locusL_of_bootstrap1
+genetree_from_locus1_of_bootstrap2
+genetree_from_locus2_of_bootstrap2
+...
+genetree_from_locusL_of_bootstrap2
+...
+...
+...
+genetree_from_locus1_of_bootstrapN
+genetree_from_locus2_of_bootstrapN
+...
+genetree_from_locusL_of_bootstrapN
+```
+
+The above command will split this big file into boot000, boot001, ... bootN-1, each with a set of L genetrees.
 
 ## 2. Clean up phylip trees and root them
 
-Create cleaning and rooting R scripts
+Create cleaning and rooting R scripts.  The following R script will clean up genetrees from Cloudforest (and save them as boot???.phy) and root them with the specified outgroup (and save them as boot???.rooted). 
 
 ```
 numboot<-500  # number of bootstrap replicates
@@ -55,7 +81,7 @@ while (end < numboot)
 }
 ```
 
-Create rooting run files
+The following R script creates cleaning/rooting job scripts for the cluster.
 
 ```
 numbers<-seq(from=0,to=480,by=20)  #indicate start, end, and interval here
@@ -86,9 +112,11 @@ To submit jobs to cluster:
 for i in zosterops.root.???; do qsub $i; done
 ```
 
+Wait for all cleaning/rooting jobs to finish before running any of the analyses below.  It's ok to get them set up while waiting for the jobs to finish.
+
 ## 3. STAR and STEAC
 
-Create STAR/STEAC R scripts
+The following R script creates R scripts to infer the STAR and STEAC trees for each set of gene trees.  Specify the outgroup name in the script.
 
 ```
 numboot<-500  # number of bootstrap replicates
@@ -138,7 +166,7 @@ ngene<-length(mytrees)'
 }
 ```
 
-Create STAR/STEAC run files
+The following R script creates job scripts to run the STAR/STEAC R scripts on the cluster.
 
 ```
 numbers<-seq(from=0,to=499,by=1)  #indicate start, end, and interval here
@@ -171,7 +199,7 @@ for i in zosterops.stst.???; do qsub $i; done
 
 ## 4. ASTRAL
 
-Create ASTRAL run files
+The following R script creates ASTRAL job scripts for the cluster.  Make sure you have the correct astral command invocation in the astralcom variable.
 
 ```
 interval<-50  #indicate interval here
@@ -213,7 +241,7 @@ for i in zosterops.ast.???; do qsub $i; done
 
 Collecting ASTRAL run times
 
-This assumes you have saved Astral output in files named *.astral.out.
+This assumes Astral output files are named *.astral.out.
 Before saving this to a file, it's good idea to pipe it to wc to check that you
 have that correct number of run times.
 
