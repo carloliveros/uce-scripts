@@ -461,18 +461,21 @@ python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_
 
 ### B. Cloudforest
 
+If you wish to perform concatenated analysis (e.g. MrBayes) on an unpartitioned dataset, skip section B and proceed to the MrBayes section.  However, if you wish to perform concatenated analysis on a partitioned dataset (partitioned by model), then perform step B1 before going to the MrBayes section.  I have found that running Cloudforest on the cluster is way faster.
+
 #### B1. Estimating gene trees
 
-For PHYLIP, PhyML, and CloudForest (also MrBayes, since we will need CloudForest's
-models info) 
+You need to perform the following steps if:
+- you wish to perform concatenated analysis on a partitioned dataset
+- you wish to estimate genetrees from bootstrapped data using Cloudforest 
 
-Convert the dataset into strict phylip format.
+First, convert the dataset into strict phylip format.
 
 ```
 python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_renamed/ --output trogons_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path trogons_log
 ```
 
-If you do not specify --shorten-names, program will take first 10 characters of name.  Consider using `rename_taxa_from_nexus_lines.py`
+Note: If you do not specify --shorten-names, program will take first 10 characters of name.  Consider using `rename_taxa_from_nexus_lines.py`
 
 If working with an incomplete matrix:
 
@@ -480,15 +483,12 @@ If working with an incomplete matrix:
 python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_inc_min_75percent_renamed/ --output trogons_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path trogons_inc_log
 ```
 
-
-Estimate gene trees and best fitting substitution models using CloudForest.
+Next, estimate gene trees and best fitting substitution models using CloudForest.
 
 ```
 mkdir trogons_cloudforest
-
 python ~/CloudForest/cloudforest/cloudforest_mpi.py trogons_phylip/ trogons_cloudforest/ genetrees /usr/bin/phyml --parallelism multiprocessing --cores 12 2>&1 | tee trogons_cloudforest/genetrees.out
 
-python /tools/cluster/6.2/cloudforest/0.1/scripts/cloudforest_mpi.py trogons_phylip/ trogons_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 12
 ```
 
 If working with an incomplete matrix:
@@ -498,7 +498,9 @@ mkdir trogons_inc_min_75percent_cloudforest
 python ~/CloudForest/cloudforest/cloudforest_mpi.py trogons_inc_min_75percent_phylip/ trogons_inc_min_75percent_cloudforest/ genetrees /usr/bin/phyml --parallelism multiprocessing --cores 12 2>&1 | tee trogons_inc_min_75percent_cloudforest/genetrees.out
 ```
 
-(on the Cluster)
+For doing the above on the cluster, copy your phylip folder on to a working directory such as /scratch/oliveros/trogons, create the output directory (`/scratch/oliveros/trogons/trogons_cloudforest or /scratch/oliveros/trogons_inc_min_75percent_cloudforest`), then use one of the following PBS scripts:
+
+For a complete matrix:
 
 ```
 #PBS -N trogons.cf.gt
@@ -511,7 +513,7 @@ python ~/CloudForest/cloudforest/cloudforest_mpi.py trogons_inc_min_75percent_ph
 unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/oliveros/trogons/trogons_phylip/ /scratch/oliveros/trogons/trogons_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/oliveros/trogons/trogons.cf.gt.out
 ```
 
-(on the Cluster, INCOMPLETE MATRIX)If working with an incomplete matrix:
+For an incomplete matrix:
 
 ```
 #PBS -N trogons.cf.gt
@@ -524,57 +526,17 @@ unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /s
 unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/oliveros/trogons/trogons_inc_min_75percent_phylip/ /scratch/oliveros/trogons/trogons_inc_min_75percent_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/oliveros/trogons/trogons.cf.gt.out
 ```
 
-Strip the models from CloudForest output.
+#### B2. Cloudforest bootstrapping
 
-```
-python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_cloudforest/genetrees.tre --output trogons.models.txt
-```
-
-If working with an incomplete matrix:
-
-```
-python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_inc_min_75percent_cloudforest/genetrees.tre --output trogons.inc.min.75percent.models.txt
-```
-
-Convert the dataset back to nexus if you wish to have the same short taxon name format across your analyses.
-
-```
-python ~/phyluce/bin/align/convert_one_align_to_another.py --alignments trogons_phylip/ --output trogons_nexus/ --input-format phylip --output-format nexus --cores 12 --log-path trogons_log
-```
-
-If working with an incomplete matrix:
-
-```
-python ~/phyluce/bin/align/convert_one_align_to_another.py --alignments trogons_inc_min_75percent_phylip/ --output trogons_inc_min_75percent_nexus/ --input-format phylip --output-format nexus --cores 12 --log-path trogons_inc_log
-```
-
-
-Create a nexus file for MrBayes.
-
-Note: Can't use `dataset1_nexus` because output of `convert_one_align_to_another.py`
-is *.nexus whereas `format_nexus_files_for_mrbayes.py` expects *.nex.
-
-```
-python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_renamed/ --models trogons.models.txt --output trogons.mrbayes.nex --unlink
-```
-
-If working with an incomplete matrix:
-
-```
-python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_inc_min_75percent_renamed/ --models trogons.inc.min.75percent.models.txt --output trogons.inc.min.75percent.mrbayes.nex --unlink
-```
-
-For a fully partitioned nexus file:
-
-```
-python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_nexus/ --models trogons-models.txt --output trogons.fully.mrbayes.nex --unlink --fully-partition
-```
+You need to perform this step if you wish to use Cloudforest to estimate genetrees from bootstrapped data.
 
 For bootstrapping with Cloudforest:
 
 ```
 python ~/CloudForest-master/cloudforest/cloudforest_mpi2.py trogons_phylip/ trogons_cloudforest_bootstrap/ bootstraps /usr/bin/phyml --genetrees trogons_cloudforest/genetrees.tre --bootreps 500 --parallelism multiprocessing --cores 12 > /dev/null
 ```
+
+You can run Cloudforest bootstrapping on the cluster.  I do this by generating bootstrapping job scripts using R in your working directory (/scratch/oliveros/trogons) and launching all these jobs.  Note that the cloudforest folder containing the genetrees.tre file should be in the working directory.
 
 Create bootstrapping jobs in R:
 
@@ -609,7 +571,36 @@ To submit jobs to cluster:
 for i in trogons.cf.???; do qsub $i; done
 ```
 
-EXABAYES
+### C. MrBayes
+
+Perform the two steps below to create a MrBayes file with the data partitioned according to the type of best fitting substitution model.
+
+First, strip the models from CloudForest output.
+
+```
+python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_cloudforest/genetrees.tre --output trogons.models.txt
+```
+
+If working with an incomplete matrix:
+
+```
+python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_inc_min_75percent_cloudforest/genetrees.tre --output trogons.inc.min.75percent.models.txt
+```
+
+Second, create a nexus file for MrBayes.
+
+```
+python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_renamed/ --models trogons.models.txt --output trogons.mrbayes.nex --unlink
+```
+
+If working with an incomplete matrix:
+
+```
+python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_inc_min_75percent_renamed/ --models trogons.inc.min.75percent.models.txt --output trogons.inc.min.75percent.mrbayes.nex --unlink
+```
+
+### D. ExaBayes
+
 Formatting Exabayes files from mrbayes files.
 
 ```
@@ -655,13 +646,13 @@ To submit jobs to cluster:
 for i in trogons.exb.???; do qsub $i; done
 ```
 
+## UTILITIES
+
 Getting informative sites
 
 ```
 python ~/phyluce/bin/align/get_informative_sites1.py --input trogons_renamed/ --output-prefix trogons --input-format nexus --cores 12 --log-path trogons_log/
 ```
-
-## UTILITIES
 
 For cleaning trinity assemblies:
 
