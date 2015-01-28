@@ -443,12 +443,30 @@ If working with an incomplete matrix:
 python ~/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment trogons_inc_min_75percent_screened --output trogons_inc_min_75percent_renamed --cores 12 --log-path trogons_inc_log
 ```
 
-The dataset is ready for phylogenetic analysis.
-
 ## STEP 9 - Formatting data for phylogenetic analysis
 
+### A. RAxML
+
+To assemble a non-partitioned dataset for RAxML:
+
+```
+python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_renamed/ --output trogons_raxml --log-path trogons_log
+```
+
+If working with an incomplete matrix:
+
+```
+python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_inc_min_75percent_renamed/ --output trogons_inc_min_75percent_raxml --log-path trogons_inc_log
+```
+
+### B. Cloudforest
+
+#### B1. Estimating gene trees
+
 For PHYLIP, PhyML, and CloudForest (also MrBayes, since we will need CloudForest's
-models info) convert the dataset into strict phylip format.
+models info) 
+
+Convert the dataset into strict phylip format.
 
 ```
 python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_renamed/ --output trogons_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path trogons_log
@@ -462,29 +480,6 @@ If working with an incomplete matrix:
 python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_inc_min_75percent_renamed/ --output trogons_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path trogons_inc_log
 ```
 
-Convert the dataset back to nexus if you wish to have the same short taxon name format across your analyses.
-
-```
-python ~/phyluce/bin/align/convert_one_align_to_another.py --alignments trogons_phylip/ --output trogons_nexus/ --input-format phylip --output-format nexus --cores 12 --log-path trogons_log
-```
-
-If working with an incomplete matrix:
-
-```
-python ~/phyluce/bin/align/convert_one_align_to_another.py --alignments trogons_inc_min_75percent_phylip/ --output trogons_inc_min_75percent_nexus/ --input-format phylip --output-format nexus --cores 12 --log-path trogons_inc_log
-```
-
-Format the dataset for RAxML analysis.
-
-```
-python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_renamed/ --output trogons_raxml --log-path trogons_log
-```
-
-If working with an incomplete matrix:
-
-```
-python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_inc_min_75percent_renamed/ --output trogons_inc_min_75percent_raxml --log-path trogons_inc_log
-```
 
 Estimate gene trees and best fitting substitution models using CloudForest.
 
@@ -540,6 +535,19 @@ If working with an incomplete matrix:
 ```
 python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_inc_min_75percent_cloudforest/genetrees.tre --output trogons.inc.min.75percent.models.txt
 ```
+
+Convert the dataset back to nexus if you wish to have the same short taxon name format across your analyses.
+
+```
+python ~/phyluce/bin/align/convert_one_align_to_another.py --alignments trogons_phylip/ --output trogons_nexus/ --input-format phylip --output-format nexus --cores 12 --log-path trogons_log
+```
+
+If working with an incomplete matrix:
+
+```
+python ~/phyluce/bin/align/convert_one_align_to_another.py --alignments trogons_inc_min_75percent_phylip/ --output trogons_inc_min_75percent_nexus/ --input-format phylip --output-format nexus --cores 12 --log-path trogons_inc_log
+```
+
 
 Create a nexus file for MrBayes.
 
