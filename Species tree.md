@@ -397,6 +397,8 @@ cat $(echo $(ls *rooted.tre)) | grep "Analysis completed" | sed -e 's/\[Analysis
 The following R script performs Steps 2 and 3 above on the original data.  Run the script in the same directory as your Cloudforest output directory (e.g., ./zosterops_cloudforest/) where the genetrees.tre file is saved.
 
 ```
+outgrouptaxon<-"StaNig"  # indicate outgroup name here
+
 library("phybase")
 # clean up phylip file
 temp<-read.tree(file="genetrees.tre")  
@@ -410,7 +412,7 @@ for(k in 1:ngenetree)
 {
 	spname<-species.name(a[k])
 	nspecies<-length(spname)
-	outgroup<-which(spname=="CyrAnn")  #indicate outgroup name here
+	outgroup<-which(spname==outgrouptaxon)  
 	b<-read.tree.nodes(a[k],spname)$node
 	d[k]<-write.subtree(2*nspecies-1,root.tree(b,outgroup),spname,2*nspecies-1)
 }
@@ -424,17 +426,14 @@ speciesname<-taxaname
 ntaxa<-length(taxaname)
 ngene<-length(mytrees)
 
-outgrouptaxon<-"CyrAnn"
 print(paste("Outgroup taxon", outgrouptaxon))
 
 treestringphy<-read.tree.string("genetrees.phy",format="phylip")
 treesphy<-treestringphy$tree
-	
 species.structure<-matrix(0,ncol=ntaxa,nrow=ntaxa)
 diag(species.structure)<-1
 print("Estimating STAR tree")
 star<-star.sptree(treesphy, speciesname, taxaname, species.structure, outgroup=outgrouptaxon,method="nj")
-starfname<-paste("star",sprintf("%03d",start),".tre", sep="")
 write.table(star,"genetrees.star.tre",row.names=F,col.names=F,quote=F,append=TRUE)
 
 treestringrooted<-read.tree.string("genetrees.rooted",format="phylip")
@@ -477,7 +476,8 @@ Summarizing trees with Dendropy
 
 ```
 sumtrees.py -o upgma.tre treefiles
-sumtrees.py -f 0.95 -o star.con.tre treefiles
+sumtrees.py -f 0.70 -o star.con.tre treefiles
+sumtrees.py -f 0.70 -o star.con.tre -t targettree treefiles
 ```
 
 Getting frequencies of splits with Dendropy from the Python interpreter
