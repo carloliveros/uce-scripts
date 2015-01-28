@@ -252,6 +252,8 @@ genus_species5
 genus_species6
 ```
 
+Use short (max 8 chars) and unique dataset names.  These dataset names will be used for directory names and cluster job names later.
+
 ### A. Run a query on the database:
 
 ```
