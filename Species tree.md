@@ -376,13 +376,6 @@ have that correct number of run times.
 cat $(echo $(ls *rooted.tre)) | grep "Analysis completed" | sed -e 's/\[Analysis completed in //' -e 's/ seconds\]//' > mpest.runtimes.txt
 ```
 
-DENDROPY
-========
-sumtrees.py -o upgma.tre treefiles
-sumtrees.py -f 0.95 -o star.con.tre treefiles
-
-
-
 ## 6. Running STAR, STEAC, ASTRAL, MP-EST on original data
 
 ```
@@ -444,6 +437,13 @@ mpest control
 ```
 
 ## Miscellaneous stuff
+
+Summarizing trees with Dendropy
+
+```
+sumtrees.py -o upgma.tre treefiles
+sumtrees.py -f 0.95 -o star.con.tre treefiles
+```
 
 Getting frequencies of splits with Dendropy
 
