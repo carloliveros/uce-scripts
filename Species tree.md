@@ -326,13 +326,13 @@ for iter in dataset1.mpest.*; do qsub $iter; done
 Collect all MP-EST trees
 
 ```
-cat *.rooted.tre | grep " tree mpest" > summary
+cat boot???.rooted.tre | grep "tree mpest" > summary
 ```
 
 Create nexus file with all trees
 
 ```
-cat zhead summary ztail > mpest.all.tre
+cat zhead summary ztail > mpest.500.tre
 ```
 
 Note:  Make zhead and ztail from nexus headers and tail of each output file.
@@ -430,10 +430,13 @@ cat boot???.rooted.tre | grep "tree mpest" | wc -l
 Summarizing trees with Dendropy
 
 ```
-sumtrees.py -o upgma.tre treefiles
-sumtrees.py -f 0.70 -o star.con.tre treefiles
-sumtrees.py -f 0.70 -o star.con.tre -t targettree treefiles
+sumtrees.py -o dataset1.star.con.tre boot???.star.tre
+sumtrees.py -o dataset1.steac.con.tre boot???.steac.tre
+sumtrees.py -o dataset1.astral.con.tre boot???.phy.astral.tre
+sumtrees.py -o dataset1.mpest.con.tre mpest.500.tre
 ```
+
+Add the -f 0.70 option to sumtrees.py to collapse nodes below 70% support.
 
 Getting frequencies of splits with Dendropy from the Python interpreter
 
