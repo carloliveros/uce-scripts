@@ -79,10 +79,10 @@ read1:{name}_L001_R1_001.fastq.gz
 read2:{name}_L001_R2_001.fastq.gz
 
 [combos]
-acryllium-vulturinum:N503,N707
+genus1_species1_1234:N503,N707
 
 [remap]
-acryllium_vulturinum_CTCTCTAC-TATCCTCT:acryllium-vulturinum
+genus1_species1_1234_CTCTCTAC-TATCCTCT:genus1_species1_1234
 
 ```
 
@@ -143,9 +143,9 @@ example config file that was named "trinity-assemblies.conf":
 
 ```
 [samples]
-aegithina-lafresnayei-23213:/public/uce/work/cleaned-reads/aegithina-lafresnayei-23213
-aleadryas-rufinucha-16569:/public/uce/work/cleaned-reads/aleadryas-rufinucha-16569
-artamus-cinereus-6183:/public/uce/work/cleaned-reads/artamus-cinereus-6183
+genus1_species1_1234:/public/uce/work/cleaned-reads/genus1_species1_1234
+genus2_species2_5678:/public/uce/work/cleaned-reads/genus2_species2_5678
+genus3_species3_9012:/public/uce/work/cleaned-reads/genus3_species3_9012
 ```
 
 The name you want things called on output is on the left side. Within each of 
@@ -160,7 +160,7 @@ number of cores you want the program to run.
 ```
 mkdir trinity-assemblies
 
-python ~/phyluce/bin/assembly/assemblo_trinity.py --conf trinity-assemblies.conf --output trinity-assemblies --subfolder 'split-adapter-quality-trimmed' --cores 12 [--clean]
+python ~/phyluce/bin/assembly/assemblo_trinity.py --conf trinity-assemblies.conf --output trinity-assemblies --subfolder 'split-adapter-quality-trimmed' --cores 12
 ```
 
 This should assemble everything in it's own folder in "trinity-assemblies".  
@@ -240,16 +240,16 @@ in the working directory.  It should look something like:
 
 ```
 [dataset1]
-genus_species1
-genus_species2
-genus_species3
-genus_species4
-genus_species5
+genus1_species1
+genus2_species2
+genus3_species3
+genus4_species4
+genus5_species5
 
 [dataset2]
-genus_species4
-genus_species5
-genus_species6
+genus4_species4
+genus5_species5
+genus6_species6
 ```
 
 Use short (max 8 chars) and unique dataset names.  These dataset names will be used for directory names and cluster job names later.
@@ -305,7 +305,7 @@ dest=/media/Dicrurus/uce/dataset1_clean
 
 [cd to cleaned reads folder]
 
-for i in apalharpactes_mackloti_b49104 apaloderma_aequatoriale_8461 euptilotis_neoxenus_prs2606 harpactes_ardens_26958 harpactes_erythrocephalus_9970 harpactes_oreskios_23185 pharomachrus_antisianus_b22870 priotelus_roseigaster_6363 priotelus_temnurus_5565 trogon_personatus_gfb2125 trogon_violaceus_rop258 ceyx_argentata_19269 otus_elegans_10975; do mkdir $dest/$i ; mkdir $dest/$i/split-adapter-quality-trimmed; cp $i/split-adapter-quality-trimmed/*READ?.fastq.gz $dest/$i/split-adapter-quality-trimmed; done;
+for i in `ls`; do mkdir $dest/$i ; mkdir $dest/$i/split-adapter-quality-trimmed; cp $i/split-adapter-quality-trimmed/*READ?.fastq.gz $dest/$i/split-adapter-quality-trimmed; done;
 ```
 
 ```
@@ -315,7 +315,7 @@ dest=/media/Dicrurus/uce/dataset1_trinity
 
 [cd to trinity assemblies folder]
 
-for i in apalharpactes_mackloti_b49104 apaloderma_aequatoriale_8461 euptilotis_neoxenus_prs2606 harpactes_ardens_26958 harpactes_erythrocephalus_9970 harpactes_oreskios_23185 pharomachrus_antisianus_b22870 priotelus_roseigaster_6363 priotelus_temnurus_5565 trogon_personatus_gfb2125 trogon_violaceus_rop258 ceyx_argentata_19269 otus_elegans_10975; do mkdir $dest/$i ; cp -L $i/contigs.fasta $dest/$i; done;
+for i in `ls`; do mkdir $dest/$i ; cp -L $i/contigs.fasta $dest/$i; done;
 ```
 
 Use the following commands in your PBS script:
@@ -344,7 +344,7 @@ cat get_trinity_coverage.log | grep 'Processing\|mean coverage' | sed -r 's/.+Pr
 cat get_trinity_coverage_for_uce_loci.log | grep 'Processing\|mean trimmed coverage' | sed -r 's/.+Processing (\w+).+/\1/' | sed -r 's/.+INFO -\s+([0-9]+) contigs, mean trimmed length = ([0-9]+\.[0-9]), mean trimmed coverage = ([0-9]+\.[0-9])x, on-target bases \(uce contigs\) = ([0-9]+\.[0-9])%, unique reads aligned \(all contigs\) = ([0-9]+\.[0-9])%/\1\t\2\t\3\t\4\t\5/' | sed '$!N;s/\n/\t/'
 ```
 
-run time (refine this)
+Collecting run times (refine this)
 
 ```
 cat get_trinity_coverage.log | grep 'Processing\|Completed' |sed -r 's/(.+) (.+),.+/\1\t\2/'
