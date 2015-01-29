@@ -257,7 +257,7 @@ Use short (max 8 chars) and unique dataset names.  These dataset names will be u
 ### A. Run a query on the database:
 
 ```
-python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'trogons' --output trogons.conf --log-path trogons_log
+python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'dataset1' --output dataset1.conf --log-path dataset1_log
 ```
 
 This will produce a config file listing taxon names from dataset1 as well as a 
@@ -265,13 +265,13 @@ list of loci for which all taxa in the list has data.  If an incomplete data
 matrix is desired, add the flag --incomplete-matrix as below:
 
 ```
-python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'trogons' --output trogons.inc.conf --log-path trogons_inc_log --incomplete-matrix
+python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'dataset1' --output dataset1.inc.conf --log-path dataset1_inc_log --incomplete-matrix
 ```
 
 ### B. Generate a fasta file for your dataset.
 
 ```
-python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output trogons.conf --output trogons.fasta --log-path trogons_log
+python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.conf --output dataset1.fasta --log-path dataset1_log
 ```
 
 If working with an incomplete data matrix, add the flag --incomplete-matrix and
@@ -279,7 +279,7 @@ the path to an incomplete.nostrict file that will hold missing locus information
 as below:
 
 ```
-python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output trogons.inc.conf --output trogons.inc.fasta --incomplete-matrix trogons.inc.nostrict --log-path trogons_inc_log
+python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.inc.conf --output dataset1.inc.fasta --incomplete-matrix dataset1.inc.nostrict --log-path dataset1_inc_log
 ```
 
 ## STEP 7 - Calculate coverage for Trinity-aligned datasets
@@ -299,9 +299,9 @@ The following commands will help you copy the needed files from your cleaned-
 reads folder and trinity-assemblies folder to the cluster.
 
 ```
-mkdir trogons_clean
+mkdir dataset1_clean
 
-dest=/media/Dicrurus/uce/trogons_clean
+dest=/media/Dicrurus/uce/dataset1_clean
 
 [cd to cleaned reads folder]
 
@@ -309,9 +309,9 @@ for i in apalharpactes_mackloti_b49104 apaloderma_aequatoriale_8461 euptilotis_n
 ```
 
 ```
-mkdir trogons_trinity
+mkdir dataset1_trinity
 
-dest=/media/Dicrurus/uce/trogons_trinity
+dest=/media/Dicrurus/uce/dataset1_trinity
 
 [cd to trinity assemblies folder]
 
@@ -323,13 +323,13 @@ Use the following commands in your PBS script:
 To calculate coverage for all contigs:
 
 ```
-python /scratch/oliveros/phyluce/bin/assembly/get_trinity_coverage.py --assemblies /scratch/oliveros/trogons/trogons_trinity/ --assemblo-config /scratch/oliveros/trogons/trinity.conf --cores 4 --subfolder 'split-adapter-quality-trimmed' --log-path /scratch/oliveros/trogons/trogons_covlog/
+python /scratch/oliveros/phyluce/bin/assembly/get_trinity_coverage.py --assemblies /scratch/username/dataset1/dataset1_trinity/ --assemblo-config /scratch/username/dataset1/trinity.conf --cores 4 --subfolder 'split-adapter-quality-trimmed' --log-path /scratch/username/dataset1/dataset1_covlog/
 ```
 
 To calculate coverage for UCE contigs.  This module is ok to run on a single processor interactive session:
 
 ```
-python /scratch/oliveros/phyluce/bin/assembly/get_trinity_coverage_for_uce_loci.py --assemblies /scratch/oliveros/trogons/trogons_trinity/ --match-count-output /scratch/oliveros/trogons/trogons.inc.conf --locus-db /scratch/oliveros/trogons/probe.matches.sqlite --output /scratch/oliveros/trogons/trogons_coverage --log-path /scratch/oliveros/trogons/trogons_covlog/
+python /scratch/oliveros/phyluce/bin/assembly/get_trinity_coverage_for_uce_loci.py --assemblies /scratch/username/dataset1/dataset1_trinity/ --match-count-output /scratch/username/dataset1/dataset1.inc.conf --locus-db /scratch/username/dataset1/probe.matches.sqlite --output /scratch/username/dataset1/dataset1_coverage --log-path /scratch/username/dataset1/dataset1_covlog/
 ```
 
 `*.jar` paths hardcoded in /phyluce/bwa.py
@@ -357,7 +357,7 @@ cat get_trinity_coverage.log | grep 'Processing\|Completed' |sed -r 's/(.+) (.+)
 The following script will create aligned nexus files by locus.
 
 ```
-python ~/phyluce/bin/align/seqcap_align_2.py --fasta trogons.fasta --output trogons_aligned --output-format fasta --taxa 71 --aligner mafft --cores 12 --log-path trogons_log
+python ~/phyluce/bin/align/seqcap_align_2.py --fasta dataset1.fasta --output dataset1_aligned --output-format fasta --taxa 71 --aligner mafft --cores 12 --log-path dataset1_log
 ```
 
 If working with an incomplete matrix, perform the three steps:
@@ -365,33 +365,33 @@ If working with an incomplete matrix, perform the three steps:
 1.  Perform alignment as above but add the flag --incomplete-matrix:
 
 ```
-python ~/phyluce/bin/align/seqcap_align_2.py --fasta trogons.inc.fasta --output trogons_inc_aligned --taxa 71 --aligner mafft --cores 12 --log-path trogons_inc_log --incomplete-matrix
+python ~/phyluce/bin/align/seqcap_align_2.py --fasta dataset1.inc.fasta --output dataset1_inc_aligned --taxa 71 --aligner mafft --cores 12 --log-path dataset1_inc_log --incomplete-matrix
 ```
 
 2.  You can set a minimum number of taxa for a locus to be included in your 
 dataset:
 
 ```
-python ~/phyluce/bin/align/get_only_loci_with_min_taxa.py --alignments trogons_inc_aligned --taxa 71 --output trogons_inc_min_75percent --percent 0.75 --cores 12 --log-path trogons_inc_log
+python ~/phyluce/bin/align/get_only_loci_with_min_taxa.py --alignments dataset1_inc_aligned --taxa 71 --output dataset1_inc_min_75percent --percent 0.75 --cores 12 --log-path dataset1_inc_log
 ```
 
 3.  Insert missing data designators for taxa missing from the alignment of a 
 given locus:
 
 ```
-python ~/phyluce/bin/align/add_missing_data_designators.py --alignments trogons_inc_min_75percent --output trogons_inc_min_75percent_with_missing --output-format fasta --match-count-output trogons.inc.conf --incomplete-matrix trogons.inc.nostrict --cores 12 --log-path trogons_inc_log
+python ~/phyluce/bin/align/add_missing_data_designators.py --alignments dataset1_inc_min_75percent --output dataset1_inc_min_75percent_with_missing --output-format fasta --match-count-output dataset1.inc.conf --incomplete-matrix dataset1.inc.nostrict --cores 12 --log-path dataset1_inc_log
 ```
 
 ### B. Trim alignments using GBlocks
 
 ```
-python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments trogons_aligned --output trogons_gbtrimmed --b2 0.65 --cores 12 --log-path trogons_log 
+python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments dataset1_aligned --output dataset1_gbtrimmed --b2 0.65 --cores 12 --log-path dataset1_log 
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments trogons_inc_min_75percent_with_missing --output trogons_inc_min_75percent_gbtrimmed --b2 0.65 --cores 12 --log-path trogons_inc_log 
+python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments dataset1_inc_min_75percent_with_missing --output dataset1_inc_min_75percent_gbtrimmed --b2 0.65 --cores 12 --log-path dataset1_inc_log 
 ```
 
 ### C. Summary stats
@@ -399,13 +399,13 @@ python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --al
 You can get summary stats from your aligned dataset.
 
 ```
-python ~/phyluce/bin/align/get_align_summary_data.py --alignments trogons_gbtrimmed --input-format nexus --cores 12 --log-path trogons_log
+python ~/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_gbtrimmed --input-format nexus --cores 12 --log-path dataset1_log
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/get_align_summary_data.py --alignments trogons_inc_min_75percent_gbtrimmed --input-format nexus --cores 12 --log-path trogons_inc_log
+python ~/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_inc_min_75percent_gbtrimmed --input-format nexus --cores 12 --log-path dataset1_inc_log
 ```
 
 ### D. Screen alignments
@@ -413,7 +413,7 @@ python ~/phyluce/bin/align/get_align_summary_data.py --alignments trogons_inc_mi
 Screen alignments for bases that are not in the set of IUPAC base codes.
 
 ```
-python ~/phyluce/bin/align/screen_alignments_for_problems.py --alignments trogons_gbtrimmed --input-format nexus --output trogons_screened  --cores 12 --log-path trogons_log
+python ~/phyluce/bin/align/screen_alignments_for_problems.py --alignments dataset1_gbtrimmed --input-format nexus --output dataset1_screened  --cores 12 --log-path dataset1_log
 ```
 
 change output to .nex  (changed code so you don't have to do this)
@@ -421,7 +421,7 @@ change output to .nex  (changed code so you don't have to do this)
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/screen_alignments_for_problems.py --alignments trogons_inc_min_75percent_gbtrimmed --input-format nexus --output trogons_inc_min_75percent_screened  --cores 12 --log-path trogons_inc_log
+python ~/phyluce/bin/align/screen_alignments_for_problems.py --alignments dataset1_inc_min_75percent_gbtrimmed --input-format nexus --output dataset1_inc_min_75percent_screened  --cores 12 --log-path dataset1_inc_log
 ```
 
 ### E. Remove loci names from the taxon names
@@ -430,19 +430,19 @@ After inspecting individual alignments, remove loci names from the taxon names i
 the nexus files.
 
 ```
-python ~/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment trogons_screened --output trogons_renamed --cores 12 --log-path trogons_log
+python ~/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_screened --output dataset1_renamed --cores 12 --log-path dataset1_log
 ```
 
 OR (IF YOU NEED TO CONVERT TO SHORTER NAMES):
 
 ```
-python ~/phyluce/bin/align/rename_taxa_from_nexus_lines.py --taxa 71 --alignment trogons_screened --output trogons_renamed --cores 12 --log-path trogons_log
+python ~/phyluce/bin/align/rename_taxa_from_nexus_lines.py --taxa 71 --alignment dataset1_screened --output dataset1_renamed --cores 12 --log-path dataset1_log
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment trogons_inc_min_75percent_screened --output trogons_inc_min_75percent_renamed --cores 12 --log-path trogons_inc_log
+python ~/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_inc_min_75percent_screened --output dataset1_inc_min_75percent_renamed --cores 12 --log-path dataset1_inc_log
 ```
 
 ## STEP 9 - Formatting data for phylogenetic analysis
@@ -452,13 +452,13 @@ python ~/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --ali
 To assemble a non-partitioned dataset for RAxML:
 
 ```
-python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_renamed/ --output trogons_raxml --log-path trogons_log
+python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments dataset1_renamed/ --output dataset1_raxml --log-path dataset1_log
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments trogons_inc_min_75percent_renamed/ --output trogons_inc_min_75percent_raxml --log-path trogons_inc_log
+python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments dataset1_inc_min_75percent_renamed/ --output dataset1_inc_min_75percent_raxml --log-path dataset1_inc_log
 ```
 
 ### B. Cloudforest
@@ -474,7 +474,7 @@ You need to perform the following steps if:
 First, convert the dataset into strict phylip format.
 
 ```
-python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_renamed/ --output trogons_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path trogons_log
+python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_renamed/ --output dataset1_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_log
 ```
 
 Note: If you do not specify --shorten-names, program will take first 10 characters of name.  Consider using `rename_taxa_from_nexus_lines.py`
@@ -482,50 +482,50 @@ Note: If you do not specify --shorten-names, program will take first 10 characte
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment trogons_inc_min_75percent_renamed/ --output trogons_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path trogons_inc_log
+python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_inc_min_75percent_renamed/ --output dataset1_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_inc_log
 ```
 
 Next, estimate gene trees and best fitting substitution models using CloudForest.
 
 ```
-mkdir trogons_cloudforest
-python ~/CloudForest/cloudforest/cloudforest_mpi.py trogons_phylip/ trogons_cloudforest/ genetrees /usr/bin/phyml --parallelism multiprocessing --cores 12 2>&1 | tee trogons_cloudforest/genetrees.out
+mkdir dataset1_cloudforest
+python ~/CloudForest/cloudforest/cloudforest_mpi.py dataset1_phylip/ dataset1_cloudforest/ genetrees /usr/bin/phyml --parallelism multiprocessing --cores 12 2>&1 | tee dataset1_cloudforest/genetrees.out
 
 ```
 
 If working with an incomplete matrix:
 
 ```
-mkdir trogons_inc_min_75percent_cloudforest
-python ~/CloudForest/cloudforest/cloudforest_mpi.py trogons_inc_min_75percent_phylip/ trogons_inc_min_75percent_cloudforest/ genetrees /usr/bin/phyml --parallelism multiprocessing --cores 12 2>&1 | tee trogons_inc_min_75percent_cloudforest/genetrees.out
+mkdir dataset1_inc_min_75percent_cloudforest
+python ~/CloudForest/cloudforest/cloudforest_mpi.py dataset1_inc_min_75percent_phylip/ dataset1_inc_min_75percent_cloudforest/ genetrees /usr/bin/phyml --parallelism multiprocessing --cores 12 2>&1 | tee dataset1_inc_min_75percent_cloudforest/genetrees.out
 ```
 
-For doing the above on the cluster, copy your phylip folder on to a working directory such as /scratch/oliveros/trogons, create the output directory (`/scratch/oliveros/trogons/trogons_cloudforest or /scratch/oliveros/trogons_inc_min_75percent_cloudforest`), then use one of the following PBS scripts:
+For doing the above on the cluster, copy your phylip folder on to a working directory such as /scratch/username/dataset1, create the output directory (`/scratch/username/dataset1/dataset1_cloudforest or /scratch/username/dataset1_inc_min_75percent_cloudforest`), then use one of the following PBS scripts:
 
 For a complete matrix:
 
 ```
-#PBS -N trogons.cf.gt
+#PBS -N dataset1.cf.gt
 #PBS -l nodes=1:ppn=20:avx,mem=16000m,walltime=168:00:00
-#PBS -M oliveros@ku.edu
+#PBS -M username@ku.edu
 #PBS -m abe
-#PBS -d /scratch/oliveros/trogons
+#PBS -d /scratch/username/dataset1
 #PBS -j oe
-#PBS -o /scratch/oliveros/trogons/trogons.cf.gt.out
-unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/oliveros/trogons/trogons_phylip/ /scratch/oliveros/trogons/trogons_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/oliveros/trogons/trogons.cf.gt.out
+#PBS -o /scratch/username/dataset1/dataset1.cf.gt.out
+unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/username/dataset1/dataset1_phylip/ /scratch/username/dataset1/dataset1_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/username/dataset1/dataset1.cf.gt.out
 ```
 
 For an incomplete matrix:
 
 ```
-#PBS -N trogons.cf.gt
+#PBS -N dataset1.cf.gt
 #PBS -l nodes=1:ppn=20:avx,mem=16000m,walltime=168:00:00
-#PBS -M oliveros@ku.edu
+#PBS -M username@ku.edu
 #PBS -m abe
-#PBS -d /scratch/oliveros/trogons
+#PBS -d /scratch/username/dataset1
 #PBS -j oe
-#PBS -o /scratch/oliveros/trogons/trogons.cf.gt.out
-unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/oliveros/trogons/trogons_inc_min_75percent_phylip/ /scratch/oliveros/trogons/trogons_inc_min_75percent_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/oliveros/trogons/trogons.cf.gt.out
+#PBS -o /scratch/username/dataset1/dataset1.cf.gt.out
+unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/username/dataset1/dataset1_inc_min_75percent_phylip/ /scratch/username/dataset1/dataset1_inc_min_75percent_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/username/dataset1/dataset1.cf.gt.out
 ```
 
 #### B2. Cloudforest bootstrapping
@@ -535,33 +535,33 @@ You need to perform this step if you wish to use Cloudforest to estimate genetre
 For bootstrapping with Cloudforest:
 
 ```
-python ~/CloudForest-master/cloudforest/cloudforest_mpi2.py trogons_phylip/ trogons_cloudforest_bootstrap/ bootstraps /usr/bin/phyml --genetrees trogons_cloudforest/genetrees.tre --bootreps 500 --parallelism multiprocessing --cores 12 > /dev/null
+python ~/CloudForest-master/cloudforest/cloudforest_mpi2.py dataset1_phylip/ dataset1_cloudforest_bootstrap/ bootstraps /usr/bin/phyml --genetrees dataset1_cloudforest/genetrees.tre --bootreps 500 --parallelism multiprocessing --cores 12 > /dev/null
 ```
 
-You can run Cloudforest bootstrapping on the cluster.  I do this by generating bootstrapping job scripts using R in your working directory (/scratch/oliveros/trogons) and launching all these jobs.  Note that the cloudforest folder containing the genetrees.tre file should be in the working directory.
+You can run Cloudforest bootstrapping on the cluster.  I do this by generating bootstrapping job scripts using R in your working directory (/scratch/username/dataset1) and launching all these jobs.  Note that the cloudforest folder containing the genetrees.tre file should be in the working directory.
 
 Create bootstrapping jobs in R:
 
 ```
 interval<-1
 numbers<-seq(from=0,to=499,by=interval)  #indicate start, end, and interval here
-dir<-"/scratch/oliveros/trogons/"
+dir<-"/scratch/username/dataset1/"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=2000m,walltime=168:00:00
-#PBS -M oliveros@ku.edu
+#PBS -M username@ku.edu
 #PBS -m n
 #PBS -r n
 #PBS -o /dev/null"
 
 for(i in numbers)
 {
-	runfile<-paste("trogons.cf.",sprintf("%03d",i),sep="")
+	runfile<-paste("dataset1.cf.",sprintf("%03d",i),sep="")
 
 	pbsn<-paste("#PBS -N",runfile)
 	pbsd<-paste("#PBS -d",dir)
 	pbse<-paste("#PBS -e ",dir,runfile,".err",sep="")
-	output<-paste(dir,"trogons_cloudforest_bootstrap",i,sep="")
+	output<-paste(dir,"dataset1_cloudforest_bootstrap",i,sep="")
 	dir.create(output)
-	command<-paste("python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/oliveros/trogons/trogons_phylip/",output, "bootstraps /tools/cluster/6.2/cloudforest/0.1/bin/phyml --genetrees /scratch/oliveros/trogons/trogons_cloudforest/genetrees.tre --bootreps", interval, "--parallelism single")
+	command<-paste("python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/username/dataset1/dataset1_phylip/",output, "bootstraps /tools/cluster/6.2/cloudforest/0.1/bin/phyml --genetrees /scratch/username/dataset1/dataset1_cloudforest/genetrees.tre --bootreps", interval, "--parallelism single")
 	a<-paste(pbsn,pbs,pbsd,pbse,command,sep="\n")
 	write.table(a,runfile, row.names=F,col.names=F,quote=F)
 }
@@ -570,8 +570,17 @@ for(i in numbers)
 To submit jobs to cluster:
 
 ```
-for i in trogons.cf.???; do qsub $i; done
+for i in dataset1.cf.???; do qsub $i; done
 ```
+
+Create a directory for performing species tree analyses and save all bootstrapping results into one file.
+
+```
+mkdir /scratch/username/dataset1/dataset1_speciestree
+
+cat /scratch/username/dataset1/dataset1_cloudforest_bootstrap*/bootrep001 > /scratch/username/dataset1/dataset1_speciestree/500-bootreps.tre
+```
+
 
 ### C. MrBayes
 
@@ -580,25 +589,25 @@ Perform the two steps below to create a MrBayes file with the data partitioned a
 First, strip the models from CloudForest output.
 
 ```
-python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_cloudforest/genetrees.tre --output trogons.models.txt
+python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees dataset1_cloudforest/genetrees.tre --output dataset1.models.txt
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees trogons_inc_min_75percent_cloudforest/genetrees.tre --output trogons.inc.min.75percent.models.txt
+python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees dataset1_inc_min_75percent_cloudforest/genetrees.tre --output dataset1.inc.min.75percent.models.txt
 ```
 
 Second, create a nexus file for MrBayes.
 
 ```
-python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_renamed/ --models trogons.models.txt --output trogons.mrbayes.nex --unlink
+python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments dataset1_renamed/ --models dataset1.models.txt --output dataset1.mrbayes.nex --unlink
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogons_inc_min_75percent_renamed/ --models trogons.inc.min.75percent.models.txt --output trogons.inc.min.75percent.mrbayes.nex --unlink
+python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments dataset1_inc_min_75percent_renamed/ --models dataset1.inc.min.75percent.models.txt --output dataset1.inc.min.75percent.mrbayes.nex --unlink
 ```
 
 ### D. ExaBayes
@@ -606,23 +615,23 @@ python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments trogon
 Formatting Exabayes files from mrbayes files.
 
 ```
-head -3 trogons.inc.min.75percent.mrbayes.nex | grep 'dimensions' | sed -r 's/\tdimensions ntax=([0-9]+) nchar=([0-9]+);/\1 \2/' > trogons.inc.min.75percent.phylip
+head -3 dataset1.inc.min.75percent.mrbayes.nex | grep 'dimensions' | sed -r 's/\tdimensions ntax=([0-9]+) nchar=([0-9]+);/\1 \2/' > dataset1.inc.min.75percent.phylip
 [head -(numtaxa + 5) tail (numtaxa)]
-head -18 trogons.inc.min.75percent.mrbayes.nex | tail -13 >> trogons.inc.min.75percent.phylip
-cat trogons.inc.min.75percent.mrbayes.nex | grep 'charset' | sed -r 's/\tcharset (.+);/DNA, \1/' > trogons.inc.min.75percent.part
+head -18 dataset1.inc.min.75percent.mrbayes.nex | tail -13 >> dataset1.inc.min.75percent.phylip
+cat dataset1.inc.min.75percent.mrbayes.nex | grep 'charset' | sed -r 's/\tcharset (.+);/DNA, \1/' > dataset1.inc.min.75percent.part
 ```
 
 Create Exabayes single chain jobs:
 
 ```
 numbers<-seq(from=1,to=1,by=1)  #indicate start, end, and interval here
-dir<-"/scratch/oliveros/trogons/trogons_inc_min_75percent_exabayes/"
-phylipfile<-paste(dir,"trogons.inc.min.75percent.phylip",sep="")
-partitionsfile<-paste(dir,"trogons.inc.min.75percent.part",sep="")
-configfile<-paste(dir,"trogons.inc.min.75percent.config.nex",sep="")
+dir<-"/scratch/username/dataset1/dataset1_inc_min_75percent_exabayes/"
+phylipfile<-paste(dir,"dataset1.inc.min.75percent.phylip",sep="")
+partitionsfile<-paste(dir,"dataset1.inc.min.75percent.part",sep="")
+configfile<-paste(dir,"dataset1.inc.min.75percent.config.nex",sep="")
 
 pbs<-"#PBS -l nodes=1:ppn=20:avx,mem=30000m,walltime=168:00:00
-#PBS -M oliveros@ku.edu
+#PBS -M username@ku.edu
 #PBS -m abe
 #PBS -r n
 #PBS -o /dev/null"
@@ -630,11 +639,11 @@ pbsd<-paste("#PBS -d",dir)
 
 for(i in numbers)
 {
-	runfile<-paste("trogons.exb",sprintf("%01d",i),sep="")
+	runfile<-paste("dataset1.exb",sprintf("%01d",i),sep="")
 	pbsn<-paste("#PBS -N",runfile)
 	pbse<-paste("#PBS -e ",dir,runfile,".err",sep="")
 	output<-paste(dir,runfile,".out",sep="")
-	name<-paste("trogons.c",i,sep="")
+	name<-paste("dataset1.c",i,sep="")
 	randseed<-floor(runif(1)*799736+1111)
 	command<-paste("unbuffer mpirun -np 20 exabayes_avx -f",phylipfile,"-q",partitionsfile,"-n",name,"-R 1 -C 1 -s",randseed,"-c",configfile,"> ",output)
 	a<-paste(pbsn,pbs,pbsd,pbse,command,sep="\n")
@@ -645,7 +654,7 @@ for(i in numbers)
 To submit jobs to cluster:
 
 ```
-for i in trogons.exb.???; do qsub $i; done
+for i in dataset1.exb.???; do qsub $i; done
 ```
 
 ## UTILITIES
@@ -653,7 +662,7 @@ for i in trogons.exb.???; do qsub $i; done
 Getting informative sites
 
 ```
-python ~/phyluce/bin/align/get_informative_sites1.py --input trogons_renamed/ --output-prefix trogons --input-format nexus --cores 12 --log-path trogons_log/
+python ~/phyluce/bin/align/get_informative_sites1.py --input dataset1_renamed/ --output-prefix dataset1 --input-format nexus --cores 12 --log-path dataset1_log/
 ```
 
 For cleaning trinity assemblies:
