@@ -41,7 +41,7 @@ Create cleaning and rooting R scripts.  The following R script will clean up gen
 ```
 numboot<-500  # number of bootstrap replicates
 increment<-20   # increment
-outgroup<-"StaNig"  #outgroup taxon
+outgroup<-"GenSpe"  #outgroup taxon
 
 start<-0
 end<-increment - 1
@@ -121,7 +121,7 @@ The following R script creates R scripts to infer the STAR and STEAC trees for e
 ```
 numboot<-500  # number of bootstrap replicates
 increment<-1   # increment
-outgroup<-"StaNig"  # outgroup taxon
+outgroup<-"GenSpe"  # outgroup taxon
 wd<-"/scratch/oliveros/zosterops/zosterops_speciestree"  # working directory
 
 start<-0
@@ -264,60 +264,15 @@ of taxa and number of genes.  The following R script
 
 ```
 nsim<-499  # number of replicates - 1
-ntaxa<-50  # number of taxa
+ntaxa<-5  # number of taxa
 ngenes<-979  # number of genes
 
 #species-allele table below
-c<-"ZosSpl 1 ZosSpl
-ZosRen 1 ZosRen
-ZosPap 1 ZosPap
-ZosMur 1 ZosMur
-ZosFus 1 ZosFus
-ZosGri 1 ZosGri
-ZosVel 1 ZosVel
-ZosKul 1 ZosKul
-ZosLti 1 ZosLti
-ZosTet 1 ZosTet
-WooLac 1 WooLac
-ZosNov 1 ZosNov
-ZosMet 1 ZosMet
-ZosJap 1 ZosJap
-ZosSem 1 ZosSem
-ZosNig 1 ZosNig
-ZosCon 1 ZosCon
-RukOle 1 RukOle
-ZosFin 1 ZosFin
-ZosAtr 1 ZosAtr
-ChlEmi 1 ChlEmi
-LopSup 1 LopSup
-StaNig 1 StaNig
-LopGoo 1 LopGoo
-ZosMon 1 ZosMon
-ZosMey 1 ZosMey
-ZosAtf 1 ZosAtf
-YuhEve 1 YuhEve
-ZosVir 1 ZosVir
-ZosMad 1 ZosMad
-ZosSen 1 ZosSen
-SpeMel 1 SpeMel
-ZosPal 1 ZosPal
-ZosEry 1 ZosEry
-ZosEve 1 ZosEve
-ZosStr 1 ZosStr
-ZosChl 1 ZosChl
-ZosFla 1 ZosFla
-ZosUgi 1 ZosUgi
-ZosSan 1 ZosSan
-ZosRnl 1 ZosRnl
-ZosLut 1 ZosLut
-ZosCit 1 ZosCit
-ZosLue 1 ZosLue
-ZosHyp 1 ZosHyp
-ZosExp 1 ZosExp
-WooSup 1 WooSup
-ZosLat 1 ZosLat
-ZosLte 1 ZosLte
-ZosLtr 1 ZosLtr"
+c<-"GenAbc 1 GenAbc
+GenDef 1 GenDef
+GenGhi 1 GenGhi
+GenJkl 1 GenJkl
+GenGho 1 GenGho"
 
 for(i in 0:nsim)
 {
@@ -397,7 +352,7 @@ cat $(echo $(ls *rooted.tre)) | grep "Analysis completed" | sed -e 's/\[Analysis
 The following R script performs Steps 2 and 3 above on the original data.  Run the script in the same directory as your Cloudforest output directory (e.g., ./zosterops_cloudforest/) where the genetrees.tre file is saved.
 
 ```
-outgrouptaxon<-"StaNig"  # indicate outgroup name here
+outgrouptaxon<-"GenSpe"  # indicate outgroup name here
 
 library("phybase")
 # clean up phylip file
