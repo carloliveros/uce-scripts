@@ -6,7 +6,7 @@ Perform the following steps in a working directory such as /scratch/oliveros/zos
 
 ## 1. Prepare bootstrap replicates
 
-Split output from cloudforest.
+Split output from Cloudforest.
 
 ```
 split --lines=1933 --suffix-length=3 -d 500-bootreps.tre boot
