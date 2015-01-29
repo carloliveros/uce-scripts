@@ -2,7 +2,7 @@
 
 ### by Carl H. Oliveros
 
-Perform the following steps in a working directory such as /scratch/oliveros/zosterops/zosterops_speciestree.
+Perform the following steps in a working directory such as /scratch/oliveros/dataset1/dataset1_speciestree.
 
 ## 1. Prepare bootstrap replicates
 
@@ -85,7 +85,7 @@ The following R script creates cleaning/rooting job scripts for the cluster.
 
 ```
 numbers<-seq(from=0,to=480,by=20)  #indicate start, end, and interval here
-dir<-"/scratch/oliveros/zosterops/zosterops_speciestree"
+dir<-"/scratch/oliveros/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=48:00:00
 #PBS -M oliveros@ku.edu
 #PBS -r n
@@ -94,7 +94,7 @@ pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=48:00:00
 
 for(i in numbers)
 {
-	runfile<-paste("zosterops.root.",sprintf("%03d",i),sep="")
+	runfile<-paste("dataset1.root.",sprintf("%03d",i),sep="")
 
 	pbsn<-paste("#PBS -N",runfile)
 	pbsd<-paste("#PBS -d",dir)
@@ -109,7 +109,7 @@ for(i in numbers)
 To submit jobs to cluster:
 
 ```
-for i in zosterops.root.???; do qsub $i; done
+for i in dataset1.root.???; do qsub $i; done
 ```
 
 Wait for all cleaning/rooting jobs to finish before running any of the analyses below.  It's ok to get them set up while waiting for the jobs to finish.
@@ -122,7 +122,7 @@ The following R script creates R scripts to infer the STAR and STEAC trees for e
 numboot<-500  # number of bootstrap replicates
 increment<-1   # increment
 outgroup<-"GenSpe"  # outgroup taxon
-wd<-"/scratch/oliveros/zosterops/zosterops_speciestree"  # working directory
+wd<-"/scratch/oliveros/dataset1/dataset1_speciestree"  # working directory
 
 start<-0
 end<-increment - 1
@@ -171,7 +171,7 @@ The following R script creates job scripts to run the STAR/STEAC R scripts on th
 ```
 numbers<-seq(from=0,to=499,by=1)  #indicate start, end, and interval here
 
-dir<-"/scratch/oliveros/zosterops/zosterops_speciestree"
+dir<-"/scratch/oliveros/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=48:00:00
 #PBS -M oliveros@ku.edu
 #PBS -r n
@@ -180,7 +180,7 @@ pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=48:00:00
 
 for(i in numbers)
 {
-	runfile<-paste("zosterops.stst.",sprintf("%03d",i),sep="")
+	runfile<-paste("dataset1.stst.",sprintf("%03d",i),sep="")
 	pbsn<-paste("#PBS -N",runfile)
 	pbsd<-paste("#PBS -d",dir)
 	pbso<-paste("#PBS -o ",dir,"/",runfile,".out",sep="")
@@ -194,7 +194,7 @@ for(i in numbers)
 To submit jobs to cluster:
 
 ```
-for i in zosterops.stst.???; do qsub $i; done
+for i in dataset1.stst.???; do qsub $i; done
 ```
 
 ## 4. ASTRAL
@@ -205,7 +205,7 @@ The following R script creates ASTRAL job scripts for the cluster.  Make sure yo
 interval<-50  #indicate interval here
 numbers<-seq(from=0,to=450,by=interval)  #indicate start, end here
 astralcom<-"unbuffer java -jar /scratch/oliveros/Astral/astral.4.4.0.jar"
-dir<-"/scratch/oliveros/zosterops/zosterops_speciestree"
+dir<-"/scratch/oliveros/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=25000m,walltime=96:00:00
 #PBS -M oliveros@ku.edu
 #PBS -m n
@@ -215,7 +215,7 @@ pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=25000m,walltime=96:00:00
 
 for(i in numbers)
 {
-	runfile<-paste("zosterops.ast.",sprintf("%03d",i),sep="")
+	runfile<-paste("dataset1.ast.",sprintf("%03d",i),sep="")
 	pbsn<-paste("#PBS -N",runfile)
 	pbsd<-paste("#PBS -d",dir)
 	comlist<-""
@@ -236,7 +236,7 @@ for(i in numbers)
 To submit jobs to cluster:
 
 ```
-for i in zosterops.ast.???; do qsub $i; done
+for i in dataset1.ast.???; do qsub $i; done
 ```
 
 Collecting ASTRAL run times
@@ -272,7 +272,7 @@ c<-"GenAbc 1 GenAbc
 GenDef 1 GenDef
 GenGhi 1 GenGhi
 GenJkl 1 GenJkl
-GenGho 1 GenGho"
+GenSpe 1 GenSpe"
 
 for(i in 0:nsim)
 {
@@ -290,7 +290,7 @@ The following R script creates MP-EST job script files for the cluster.
 interval<-1  #indicate interval here
 numbers<-seq(from=0,to=499,by=interval)  #indicate start, end here
 #numbers<-c(9,28,89,109,129,189,248,288,308,348,369,468,489)
-dir<-"/scratch/oliveros/zosterops/zosterops_speciestree"
+dir<-"/scratch/oliveros/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=96:00:00
 #PBS -M oliveros@ku.edu
 #PBS -r n
@@ -299,7 +299,7 @@ pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=96:00:00
 
 for(i in numbers)
 {
-	runfile<-paste("zosterops.mpest.",sprintf("%03d",i),sep="")
+	runfile<-paste("dataset1.mpest.",sprintf("%03d",i),sep="")
 
 	pbsn<-paste("#PBS -N",runfile)
 	pbsd<-paste("#PBS -d",dir)
@@ -320,7 +320,7 @@ for(i in numbers)
 Submit MP-EST jobs to cluster:
 
 ```
-for iter in zosterops.mpest.*; do qsub $iter; done
+for iter in dataset1.mpest.*; do qsub $iter; done
 ```
 
 Collect all MP-EST trees
@@ -349,7 +349,7 @@ cat $(echo $(ls *rooted.tre)) | grep "Analysis completed" | sed -e 's/\[Analysis
 
 ## 6. Running STAR, STEAC, ASTRAL, MP-EST on original data
 
-The following R script performs Steps 2 and 3 above on the original data.  Run the script in the same directory as your Cloudforest output directory (e.g., ./zosterops_cloudforest/) where the genetrees.tre file is saved.
+The following R script performs Steps 2 and 3 above on the original data.  Run the script in the same directory as your Cloudforest output directory (e.g., ./dataset1_cloudforest/) where the genetrees.tre file is saved.
 
 ```
 outgrouptaxon<-"GenSpe"  # indicate outgroup name here
