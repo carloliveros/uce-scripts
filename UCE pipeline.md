@@ -16,7 +16,7 @@ Read these pages in conjunction with this document.
 
 1 - Run illumiprocessor.py
 
-2 - Run Velvet to Assemble Contigs for each species
+2 - Assemble reads into contigs
 
 3 - Match Probes to Themselves
 
@@ -26,9 +26,11 @@ Read these pages in conjunction with this document.
 
 6 - Assemble dataset
 
-7 - Sequence alignment
+7 - Calculate coverage for Trinity-aligned datasets
 
-8 - Format data for phylogenetic analysis
+8 - Sequence alignment
+
+9 - Formatting data for phylogenetic analysis
 
 ## STEP 1 - Run illumiprocessor.py
 
