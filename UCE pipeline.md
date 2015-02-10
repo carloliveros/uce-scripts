@@ -159,9 +159,9 @@ an output path, the name of the subfolder where reads are located, and the
 number of cores you want the program to run.
 
 ```
-mkdir trinity-assemblies
+mkdir trinity_assemblies
 
-python ~/phyluce/bin/assembly/assemblo_trinity.py --conf trinity-assemblies.conf --output trinity-assemblies --subfolder 'split-adapter-quality-trimmed' --cores 12
+python ~/phyluce/bin/assembly/assemblo_trinity.py --conf trinity-assemblies.conf --output trinity_assemblies --subfolder 'split-adapter-quality-trimmed' --cores 12
 ```
 
 This should assemble everything in it's own folder in "trinity-assemblies".  
@@ -224,7 +224,7 @@ OLD VERSION
 match_contigs_to_probes.py /public/uce/work/cleaned-reads/contigs /public/uce/work/LSU-Custom-Array-Jan-2013.fasta /public/uce/work/lastz --regex "_p[1-9]+$" --repl "" --dupefile /public/uce/work/LSU-Custom-Array-Jan-2013-to-self.fasta
 
 NEW VERSION
-python ~/phyluce/bin/assembly/match_contigs_to_probes.py --contigs trinity-assemblies/contigs/ --probes 5k-probes.fasta  --dupefile 5k-probes-to-self.fasta --output ./lastz/ --regex "(chr\w+)(?:_probe\d+)"
+python ~/phyluce/bin/assembly/match_contigs_to_probes.py --contigs trinity_assemblies/contigs/ --probes 5k-probes.fasta  --dupefile 5k-probes-to-self.fasta --output ./lastz/ --regex "(chr\w+)(?:_probe\d+)"
 ```
 
 ## STEP 5 - Inspect data using sqlite
@@ -280,7 +280,7 @@ the path to an incomplete.nostrict file that will hold missing locus information
 as below:
 
 ```
-python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.inc.conf --output dataset1.inc.fasta --incomplete-matrix dataset1.inc.nostrict --log-path dataset1_inc_log
+python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity_assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.inc.conf --output dataset1.inc.fasta --incomplete-matrix dataset1.inc.nostrict --log-path dataset1_inc_log
 ```
 
 ## STEP 7 - Calculate coverage for Trinity-aligned datasets
