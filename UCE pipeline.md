@@ -272,7 +272,7 @@ python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches
 ### B. Generate a fasta file for your dataset.
 
 ```
-python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity-assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.conf --output dataset1.fasta --log-path dataset1_log
+python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity_assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.conf --output dataset1.fasta --log-path dataset1_log
 ```
 
 If working with an incomplete data matrix, add the flag --incomplete-matrix and
