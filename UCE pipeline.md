@@ -14,19 +14,17 @@ Read these pages in conjunction with this document.
 
 2 - Assemble reads into contigs
 
-3 - Match Probes to Themselves
+3 - Extract UCE contigs 
 
-4 - Extract UCE contigs 
+4 - Inspect data using sqlite
 
-5 - Inspect data using sqlite
+5 - Assemble dataset
 
-6 - Assemble dataset
+6 - Calculate coverage for Trinity-aligned datasets
 
-7 - Calculate coverage for Trinity-aligned datasets
+7 - Sequence alignment
 
-8 - Sequence alignment
-
-9 - Formatting data for phylogenetic analysis
+8 - Formatting data for phylogenetic analysis
 
 ## STEP 1 - Run illumiprocessor.py
 
@@ -34,15 +32,7 @@ The illumiprocessor python script trims adapter contamination and performs
 quality checking of reads. Create a folder in your work folder and copy all raw
 read files in that folder.
 
-Create a configuration file for illumiprocessor.py.  This file will tell 
-illumiprocessor.py which index from the sequence reads corresponds to which 
-individual (combos section), the sequences corresponding to each index,
-what adapter sequences was used for the Illumina run (adapters section) 
-so it can remove fragments of those (with the appropriate indices inserted 
-in the asterisks), the input file names (params section), and what name to
-use in the output files (remap section). USE ALL SMALL LETTERS FOR NAMES.
-
-Open a text editor and create the mapping file as follows:
+Create a configuration file for illumiprocessor.py.  USE ALL SMALL LETTERS FOR NAMES.
 
 For illumiprocessor Version 2:
 
@@ -60,18 +50,18 @@ i5-03H:CAGTGCTT
 i5-03E:TGTTCCGT
 
 [tag map]
-tockus_erythrorhynchus_15512_GTCTTGCA-AACACCAC:i7-0708,i5-03A
-tockus_fasciatus_15700_GTCTTGCA-TGAGCTGT:i7-0708,i5-03B
-tockus_leucomelas_26718_GTCTTGCA-TGACAACC:i7-0708,i5-03D
-tockus_nasutus_15475_GTCTTGCA-CAGTGCTT:i7-0708,i5-03H
-tropicranus_albocristatus_8703_GTCTTGCA-TGTTCCGT:i7-0708,i5-03E
+genus1_species1_15512_GTCTTGCA-AACACCAC:i7-0708,i5-03A
+genus2_species2_15700_GTCTTGCA-TGAGCTGT:i7-0708,i5-03B
+genus3_species3_26718_GTCTTGCA-TGACAACC:i7-0708,i5-03D
+genus4_species4_15475_GTCTTGCA-CAGTGCTT:i7-0708,i5-03H
+genus5_species5_8703_GTCTTGCA-TGTTCCGT:i7-0708,i5-03E
 
 [names]
-tockus_erythrorhynchus_15512_GTCTTGCA-AACACCAC:tockus_erythrorhynchus_15512
-tockus_fasciatus_15700_GTCTTGCA-TGAGCTGT:tockus_fasciatus_15700
-tockus_leucomelas_26718_GTCTTGCA-TGACAACC:tockus_leucomelas_26718
-tockus_nasutus_15475_GTCTTGCA-CAGTGCTT:tockus_nasutus_15475
-tropicranus_albocristatus_8703_GTCTTGCA-TGTTCCGT:tropicranus_albocristatus_8703
+genus1_species1_15512_GTCTTGCA-AACACCAC:genus1_species1_15512
+genus2_species2_15700_GTCTTGCA-TGAGCTGT:genus2_species2_15700
+genus3_species3_GTCTTGCA-TGACAACC:genus3_species3_26718
+genus4_species4_15475_GTCTTGCA-CAGTGCTT:genus4_species4_15475
+genus5_species5_8703_GTCTTGCA-TGTTCCGT:genus5_species5_8703
 
 ```
 
@@ -122,7 +112,7 @@ the output directory, your config file, and the number of processors to be used.
 
 version 2
 ```
-illumiprocessor --input raw_reads --output cleaned_reads/ --config preprocess.conf --cores 12
+illumiprocessor --input raw_reads --output cleaned_reads --config preprocess.conf --trimmomatic /anaconda/jar/trimmomatic.jar --log-path logs --cores 12
 ```
 
 version 1
@@ -137,16 +127,16 @@ In this step, you could use Trinity (preferred) or Velvet.
 
 ### 2a - Run Trinity to Assemble Contigs for each species
 
-You will run the python script assemblo_trinity.py to assemble contigs for
+Run the python script assemblo_trinity.py to assemble contigs for
 each species.  You need to create a run config file, that tells the script
 where the read data are and what you want the final data named. Below is an 
 example config file that was named "trinity-assemblies.conf":
 
 ```
 [samples]
-genus1_species1_1234:/public/uce/work/cleaned-reads/genus1_species1_1234
-genus2_species2_5678:/public/uce/work/cleaned-reads/genus2_species2_5678
-genus3_species3_9012:/public/uce/work/cleaned-reads/genus3_species3_9012
+genus1_species1_1234:/path-to/cleaned-reads/genus1_species1_1234
+genus2_species2_5678:/path-to/cleaned-reads/genus2_species2_5678
+genus3_species3_9012:/path-to/cleaned-reads/genus3_species3_9012
 ```
 
 The name you want things called on output is on the left side. Within each of 
@@ -161,7 +151,8 @@ number of cores you want the program to run.
 ```
 mkdir trinity_assemblies
 
-python ~/phyluce/bin/assembly/assemblo_trinity.py --conf trinity-assemblies.conf --output trinity_assemblies --subfolder 'split-adapter-quality-trimmed' --cores 12
+python /public/uce/phyluce/bin/assembly/assemblo_trinity.py --conf trinity.conf --output trinity_assemblies --subfolder 'split-adapter-quality-trimmed' --cores 2
+
 ```
 
 This should assemble everything in it's own folder in "trinity-assemblies".  
@@ -203,38 +194,29 @@ want to use.  The resulting contigs (symlinks) will be found in the contigs
 directory in the cleaned reads directory.
 
 
-## STEP 3 - Match Probes to Themselves
-
-This step can be skipped if previously done.  Just copy the probe and dupe files
-to your working directory.
-
-Run easy_lastz:
-
-```
-python ~/phyluce/bin/share/easy_lastz.py --target 5472_probes.fasta --query 5472_probes.fasta --output 5472_probes_to_self.fasta --identity 85
-```
-
-## STEP 4 - Extract UCE contigs 
+## STEP 3 - Extract UCE contigs 
 
 Match assembled contigs to self-matched probes and extract the contigs matching 
 UCE probes.  
 
 ```
-OLD VERSION
+NEW VERSION
+python /public/uce/phyluce/bin/assembly/match_contigs_to_probes.py --contigs /path/to/assembly/contigs/ --probes uce-5k-probes.fasta --output lastz --log-path logs
+
+OLD VERSIONS
 match_contigs_to_probes.py /public/uce/work/cleaned-reads/contigs /public/uce/work/LSU-Custom-Array-Jan-2013.fasta /public/uce/work/lastz --regex "_p[1-9]+$" --repl "" --dupefile /public/uce/work/LSU-Custom-Array-Jan-2013-to-self.fasta
 
-NEW VERSION
-python ~/phyluce/bin/assembly/match_contigs_to_probes.py --contigs trinity_assemblies/contigs/ --probes 5k-probes.fasta  --dupefile 5k-probes-to-self.fasta --output ./lastz/ --regex "(chr\w+)(?:_probe\d+)"
+python /public/uce/phyluce/bin/assembly/match_contigs_to_probes.py --contigs trinity_assemblies/contigs/ --probes 5k-probes.fasta  --dupefile 5k-probes-to-self.fasta --output ./lastz/ --regex "(chr\w+)(?:_probe\d+)"
 ```
 
-## STEP 5 - Inspect data using sqlite
+## STEP 4 - Inspect data using sqlite
 
 See Brant's github page for more details.  It's all there!
 
 https://github.com/faircloth-lab/phyluce/blob/master/docs/uce-processing.rst
 
 
-## STEP 6 - Assemble dataset
+## STEP 5 - Assemble dataset
 
 Create a dataset configuration in a file, e.g. datasets.conf, and save it
 in the working directory.  It should look something like:
@@ -258,7 +240,7 @@ Use short (max 8 chars) and unique dataset names.  These dataset names will be u
 ### A. Run a query on the database:
 
 ```
-python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'dataset1' --output dataset1.conf --log-path dataset1_log
+python /public/uce/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'dataset1' --output dataset1.conf --log-path dataset1_log
 ```
 
 This will produce a config file listing taxon names from dataset1 as well as a 
@@ -266,13 +248,13 @@ list of loci for which all taxa in the list has data.  If an incomplete data
 matrix is desired, add the flag --incomplete-matrix as below:
 
 ```
-python ~/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'dataset1' --output dataset1.inc.conf --log-path dataset1_inc_log --incomplete-matrix
+python /public/uce/phyluce/bin/assembly/get_match_counts.py --locus-db lastz/probe.matches.sqlite --taxon-list-config datasets.conf --taxon-group 'dataset1' --output dataset1.inc.conf --log-path dataset1_inc_log --incomplete-matrix
 ```
 
 ### B. Generate a fasta file for your dataset.
 
 ```
-python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity_assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.conf --output dataset1.fasta --log-path dataset1_log
+python /public/uce/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity_assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.conf --output dataset1.fasta --log-path dataset1_log
 ```
 
 If working with an incomplete data matrix, add the flag --incomplete-matrix and
@@ -280,10 +262,10 @@ the path to an incomplete.nostrict file that will hold missing locus information
 as below:
 
 ```
-python ~/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity_assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.inc.conf --output dataset1.inc.fasta --incomplete-matrix dataset1.inc.nostrict --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/assembly/get_fastas_from_match_counts.py --contigs trinity_assemblies/contigs/ --locus-db lastz/probe.matches.sqlite --match-count-output dataset1.inc.conf --output dataset1.inc.fasta --incomplete-matrix dataset1.inc.nostrict --log-path dataset1_inc_log
 ```
 
-## STEP 7 - Calculate coverage for Trinity-aligned datasets
+## STEP 6 - Calculate coverage for Trinity-aligned datasets
 
 For this step you will need:
 - cleaned reads folder that contains a folder for each sample and raw reads 1
@@ -351,14 +333,14 @@ Collecting run times (refine this)
 cat get_trinity_coverage.log | grep 'Processing\|Completed' |sed -r 's/(.+) (.+),.+/\1\t\2/'
 ```
 
-## STEP 8 - Sequence alignment
+## STEP 7 - Sequence alignment
 
 ### A. Align the dataset.  
 
 The following script will create aligned nexus files by locus.
 
 ```
-python ~/phyluce/bin/align/seqcap_align_2.py --fasta dataset1.fasta --output dataset1_aligned --output-format fasta --taxa 71 --aligner mafft --cores 12 --log-path dataset1_log
+python /public/uce/phyluce/bin/align/seqcap_align_2.py --fasta dataset1.fasta --output dataset1_aligned --output-format fasta --taxa 71 --aligner mafft --cores 12 --log-path dataset1_log
 ```
 
 If working with an incomplete matrix, perform the three steps:
@@ -366,33 +348,33 @@ If working with an incomplete matrix, perform the three steps:
 1.  Perform alignment as above but add the flag --incomplete-matrix:
 
 ```
-python ~/phyluce/bin/align/seqcap_align_2.py --fasta dataset1.inc.fasta --output dataset1_inc_aligned --taxa 71 --aligner mafft --cores 12 --log-path dataset1_inc_log --incomplete-matrix
+python /public/uce/phyluce/bin/align/seqcap_align_2.py --fasta dataset1.inc.fasta --output dataset1_inc_aligned --taxa 71 --aligner mafft --cores 12 --log-path dataset1_inc_log --incomplete-matrix
 ```
 
 2.  You can set a minimum number of taxa for a locus to be included in your 
 dataset:
 
 ```
-python ~/phyluce/bin/align/get_only_loci_with_min_taxa.py --alignments dataset1_inc_aligned --taxa 71 --output dataset1_inc_min_75percent --percent 0.75 --cores 12 --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/align/get_only_loci_with_min_taxa.py --alignments dataset1_inc_aligned --taxa 71 --output dataset1_inc_min_75percent --percent 0.75 --cores 12 --log-path dataset1_inc_log
 ```
 
 3.  Insert missing data designators for taxa missing from the alignment of a 
 given locus:
 
 ```
-python ~/phyluce/bin/align/add_missing_data_designators.py --alignments dataset1_inc_min_75percent --output dataset1_inc_min_75percent_with_missing --output-format fasta --match-count-output dataset1.inc.conf --incomplete-matrix dataset1.inc.nostrict --cores 12 --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/align/add_missing_data_designators.py --alignments dataset1_inc_min_75percent --output dataset1_inc_min_75percent_with_missing --output-format fasta --match-count-output dataset1.inc.conf --incomplete-matrix dataset1.inc.nostrict --cores 12 --log-path dataset1_inc_log
 ```
 
 ### B. Trim alignments using GBlocks
 
 ```
-python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments dataset1_aligned --output dataset1_gbtrimmed --b2 0.65 --cores 12 --log-path dataset1_log 
+python /public/uce/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments dataset1_aligned --output dataset1_gbtrimmed --b2 0.65 --cores 12 --log-path dataset1_log 
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments dataset1_inc_min_75percent_with_missing --output dataset1_inc_min_75percent_gbtrimmed --b2 0.65 --cores 12 --log-path dataset1_inc_log 
+python /public/uce/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments dataset1_inc_min_75percent_with_missing --output dataset1_inc_min_75percent_gbtrimmed --b2 0.65 --cores 12 --log-path dataset1_inc_log 
 ```
 
 ### C. Summary stats
@@ -400,13 +382,13 @@ python ~/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --al
 You can get summary stats from your aligned dataset.
 
 ```
-python ~/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_gbtrimmed --input-format nexus --cores 12 --log-path dataset1_log
+python /public/uce/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_gbtrimmed --input-format nexus --cores 12 --log-path dataset1_log
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_inc_min_75percent_gbtrimmed --input-format nexus --cores 12 --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_inc_min_75percent_gbtrimmed --input-format nexus --cores 12 --log-path dataset1_inc_log
 ```
 
 ### D. Screen alignments
@@ -414,7 +396,7 @@ python ~/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_inc_m
 Screen alignments for bases that are not in the set of IUPAC base codes.
 
 ```
-python ~/phyluce/bin/align/screen_alignments_for_problems.py --alignments dataset1_gbtrimmed --input-format nexus --output dataset1_screened  --cores 12 --log-path dataset1_log
+python /public/uce/phyluce/bin/align/screen_alignments_for_problems.py --alignments dataset1_gbtrimmed --input-format nexus --output dataset1_screened  --cores 12 --log-path dataset1_log
 ```
 
 change output to .nex  (changed code so you don't have to do this)
@@ -422,7 +404,7 @@ change output to .nex  (changed code so you don't have to do this)
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/screen_alignments_for_problems.py --alignments dataset1_inc_min_75percent_gbtrimmed --input-format nexus --output dataset1_inc_min_75percent_screened  --cores 12 --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/align/screen_alignments_for_problems.py --alignments dataset1_inc_min_75percent_gbtrimmed --input-format nexus --output dataset1_inc_min_75percent_screened  --cores 12 --log-path dataset1_inc_log
 ```
 
 ### E. Remove loci names from the taxon names
@@ -431,35 +413,35 @@ After inspecting individual alignments, remove loci names from the taxon names i
 the nexus files.
 
 ```
-python ~/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_screened --output dataset1_renamed --cores 12 --log-path dataset1_log
+python /public/uce/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_screened --output dataset1_renamed --cores 12 --log-path dataset1_log
 ```
 
 OR (IF YOU NEED TO CONVERT TO SHORTER NAMES):
 
 ```
-python ~/phyluce/bin/align/rename_taxa_from_nexus_lines.py --taxa 71 --alignment dataset1_screened --output dataset1_renamed --cores 12 --log-path dataset1_log
+python /public/uce/phyluce/bin/align/rename_taxa_from_nexus_lines.py --taxa 71 --alignment dataset1_screened --output dataset1_renamed --cores 12 --log-path dataset1_log
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_inc_min_75percent_screened --output dataset1_inc_min_75percent_renamed --cores 12 --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_inc_min_75percent_screened --output dataset1_inc_min_75percent_renamed --cores 12 --log-path dataset1_inc_log
 ```
 
-## STEP 9 - Formatting data for phylogenetic analysis
+## STEP 8 - Formatting data for phylogenetic analysis
 
 ### A. RAxML
 
 To assemble a non-partitioned dataset for RAxML:
 
 ```
-python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments dataset1_renamed/ --output dataset1_raxml --log-path dataset1_log
+python /public/uce/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments dataset1_renamed/ --output dataset1_raxml --log-path dataset1_log
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments dataset1_inc_min_75percent_renamed/ --output dataset1_inc_min_75percent_raxml --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/align/format_nexus_files_for_raxml.py --alignments dataset1_inc_min_75percent_renamed/ --output dataset1_inc_min_75percent_raxml --log-path dataset1_inc_log
 ```
 
 ### B. Cloudforest
@@ -475,7 +457,7 @@ You need to perform the following steps if:
 First, convert the dataset into strict phylip format.
 
 ```
-python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_renamed/ --output dataset1_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_log
+python /public/uce/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_renamed/ --output dataset1_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_log
 ```
 
 Note: If you do not specify --shorten-names, program will take first 10 characters of name.  Consider using `rename_taxa_from_nexus_lines.py`
@@ -483,7 +465,7 @@ Note: If you do not specify --shorten-names, program will take first 10 characte
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_inc_min_75percent_renamed/ --output dataset1_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_inc_min_75percent_renamed/ --output dataset1_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_inc_log
 ```
 
 Next, estimate gene trees and best fitting substitution models using CloudForest.
@@ -590,25 +572,25 @@ Perform the two steps below to create a MrBayes file with the data partitioned a
 First, strip the models from CloudForest output.
 
 ```
-python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees dataset1_cloudforest/genetrees.tre --output dataset1.models.txt
+python /public/uce/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees dataset1_cloudforest/genetrees.tre --output dataset1.models.txt
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees dataset1_inc_min_75percent_cloudforest/genetrees.tre --output dataset1.inc.min.75percent.models.txt
+python /public/uce/phyluce/bin/genetrees/split_models_from_genetrees.py --genetrees dataset1_inc_min_75percent_cloudforest/genetrees.tre --output dataset1.inc.min.75percent.models.txt
 ```
 
 Second, create a nexus file for MrBayes.
 
 ```
-python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments dataset1_renamed/ --models dataset1.models.txt --output dataset1.mrbayes.nex --unlink
+python /public/uce/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments dataset1_renamed/ --models dataset1.models.txt --output dataset1.mrbayes.nex --unlink
 ```
 
 If working with an incomplete matrix:
 
 ```
-python ~/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments dataset1_inc_min_75percent_renamed/ --models dataset1.inc.min.75percent.models.txt --output dataset1.inc.min.75percent.mrbayes.nex --unlink
+python /public/uce/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments dataset1_inc_min_75percent_renamed/ --models dataset1.inc.min.75percent.models.txt --output dataset1.inc.min.75percent.mrbayes.nex --unlink
 ```
 
 ### D. ExaBayes
@@ -663,7 +645,7 @@ for i in dataset1.exb.???; do qsub $i; done
 Getting informative sites
 
 ```
-python ~/phyluce/bin/align/get_informative_sites1.py --input dataset1_renamed/ --output-prefix dataset1 --input-format nexus --cores 12 --log-path dataset1_log/
+python /public/uce/phyluce/bin/align/get_informative_sites1.py --input dataset1_renamed/ --output-prefix dataset1 --input-format nexus --cores 12 --log-path dataset1_log/
 ```
 
 For cleaning trinity assemblies:
