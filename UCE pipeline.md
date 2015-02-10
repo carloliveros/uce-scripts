@@ -44,32 +44,57 @@ use in the output files (remap section). USE ALL SMALL LETTERS FOR NAMES.
 
 Open a text editor and create the mapping file as follows:
 
+For illumiprocessor Version 2:
+
 ```
 [adapters]
-N7:CTGTCTCTTATACACATCTCCGAGCCCACGAGAC*ATCTCGTATGCCGTCTTCTGCTTG
-N5:CTGTCTCTTATACACATCTGACGCTGCCGACGA*GTGTAGATCTCGGTGGTCGCCGTATCATT
+i7:GATCGGAAGAGCACACGTCTGAACTCCAGTCAC*ATCTCGTATGCCGTCTTCTGCTTG
+i5:AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT*GTGTAGATCTCGGTGGTCGCCGTATCATT
+
+[tag sequences]
+i7-0708:TGCAAGAC
+i5-03A:AACACCAC
+i5-03B:TGAGCTGT
+i5-03D:TGACAACC
+i5-03H:CAGTGCTT
+i5-03E:TGTTCCGT
+
+[tag map]
+tockus_erythrorhynchus_15512_GTCTTGCA-AACACCAC:i7-0708,i5-03A
+tockus_fasciatus_15700_GTCTTGCA-TGAGCTGT:i7-0708,i5-03B
+tockus_leucomelas_26718_GTCTTGCA-TGACAACC:i7-0708,i5-03D
+tockus_nasutus_15475_GTCTTGCA-CAGTGCTT:i7-0708,i5-03H
+tropicranus_albocristatus_8703_GTCTTGCA-TGTTCCGT:i7-0708,i5-03E
+
+[names]
+tockus_erythrorhynchus_15512_GTCTTGCA-AACACCAC:tockus_erythrorhynchus_15512
+tockus_fasciatus_15700_GTCTTGCA-TGAGCTGT:tockus_fasciatus_15700
+tockus_leucomelas_26718_GTCTTGCA-TGACAACC:tockus_leucomelas_26718
+tockus_nasutus_15475_GTCTTGCA-CAGTGCTT:tockus_nasutus_15475
+tropicranus_albocristatus_8703_GTCTTGCA-TGTTCCGT:tropicranus_albocristatus_8703
+
+```
+
+For illumiprocessor version 1:
+
+```
+[adapters]
+N7:GATCGGAAGAGCACACGTCTGAACTCCAGTCAC*ATCTCGTATGCCGTCTTCTGCTTG
+N5:AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT*GTGTAGATCTCGGTGGTCGCCGTATCATT
 
 [indexes]
-N701:TAAGGCGA
-N702:CGTACTAG
-N703:AGGCAGAA
-N704:TCCTGAGC
-N705:GGACTCCT
-N706:TAGGCATG
-N707:CTCTCTAC
-N708:CAGAGAGG
-N709:GCTACGCT
-N710:CGAGGCTG
-N711:AAGAGGCA
-N712:GTAGAGGA
-N501:TAGATCGC
-N502:CTCTCTAT
-N503:TATCCTCT
-N504:AGAGTAGA
-N505:GTAAGGAG
-N506:ACTGCATA
-N507:AAGGAGTA
-N508:CTAAGCCT
+N7_07_01:GAGAAGGT
+N7_07_02:ACTGGTGT
+N7_07_03:CTTCCTTC
+N7_07_04:TCACTCGA
+N5_03_A:AACACCAC
+N5_03_B:TGAGCTGT
+N5_03_C:CACAGGAA
+N5_03_D:TGACAACC
+N5_03_E:TGTTCCGT
+N5_03_F:CCTAGAGA
+N5_03_G:GCATAACG
+N5_03_H:CAGTGCTT
 
 [params]
 separate reads:True
@@ -77,19 +102,19 @@ read1:{name}_L001_R1_001.fastq.gz
 read2:{name}_L001_R2_001.fastq.gz
 
 [combos]
-genus1_species1_1234:N503,N707
+genus1_species1_1234:N7_07_01,N5_03_A
 
 [remap]
-genus1_species1_1234_CTCTCTAC-TATCCTCT:genus1_species1_1234
+genus1_species1_1234_ACCTTCTC-AACACCAC:genus1_species1_1234
 
 ```
 
-Save the file on the /public/uce/work folder as pre-process.conf.
+Save the file on the working directory as preprocess.conf.
 
-Navigate to your working directory and create a directory that will contain the output.
+Navigate to your working directory and create a directory that will contain the output (only for version 1).
 
 ```
-mkdir cleaned-reads
+mkdir cleaned_reads
 ```
 
 Call the program and insert arguments for the input (the folder containing raw reads),
@@ -97,36 +122,14 @@ the output directory, your config file, and the number of processors to be used.
 
 version 2
 ```
-illumiprocessor --input L001/ --output cleaned-reads/ --config illumiprocessor.conf --cores 12
+illumiprocessor --input raw_reads --output cleaned_reads/ --config preprocess.conf --cores 12
 ```
 
 version 1
 ```
-illumiprocessor.py /public/uce/work/L006/ /public/uce/work/cleaned-reads/ /public/uce/work/preprocess.conf --remap --complex --cores 12
+illumiprocessor.py raw_reads cleaned_reads preprocess.conf --remap --complex --cores 12
 ```
 
-If CBOT was not used in the Illumina sequencing run, you will have to run 
-illumiprocessor.py twice (assuming a rapid run of two lanes).  You will 
-have to make two versions of the config file differing only in the file name 
-extensions given in the params settings.  Store the output of one run in 
-cleaned-reads, and the other in cleaned-reads2.  The outputs of both 
-illumiprocessor runs should be concatenated.
-
-```
-cd /public/uce/work
-
-mkdir cleaned-reads2
-
-illumiprocessor.py /public/uce/work/L007/ /public/uce/work/cleaned-reads/ /public/uce/work/preprocess1.conf --remap --complex --cores 12
-
-illumiprocessor.py /public/uce/work/L008/ /public/uce/work/cleaned-reads2/ /public/uce/work/preprocess2.conf --remap --complex --cores 12
-
-for iter in * ; do cat /public/uce/work/cleaned-reads2/$iter/interleaved-adapter-quality-trimmed/$iter-READ1and2-interleaved.fastq.gz >> /public/uce/work/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ1and2-interleaved.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/work/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; done
-
-for iter in * ; do cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz; cat /public/uce/work/cleaned-reads2/$iter/split-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/work/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; done
-
-for iter in * ; do cat /public/uce/aug/cleaned-reads8/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/interleaved-adapter-quality-trimmed/$iter-READ-singleton.fastq.gz; cat /public/uce/aug/cleaned-reads8/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ1.fastq.gz; cat /public/uce/aug/cleaned-reads8/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz >> /public/uce/aug/cleaned-reads/$iter/split-adapter-quality-trimmed/$iter-READ2.fastq.gz; done
-```
 
 ## STEP 2 - Assemble reads into contigs
 
