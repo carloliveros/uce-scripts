@@ -196,6 +196,12 @@ directory in the cleaned reads directory.
 
 ## STEP 3 - Extract UCE contigs 
 
+Download the probe set
+
+```
+wget https://raw.githubusercontent.com/faircloth-lab/uce-probe-sets/master/uce-5k-probe-set/uce-5k-probes.fasta
+```
+
 Match assembled contigs to self-matched probes and extract the contigs matching 
 UCE probes.  
 
