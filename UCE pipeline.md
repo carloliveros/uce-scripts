@@ -377,55 +377,39 @@ If working with an incomplete matrix:
 python /public/uce/phyluce/bin/align/get_gblocks_trimmed_alignments_from_untrimmed.py --alignments dataset1_inc_min_75percent_with_missing --output dataset1_inc_min_75percent_gbtrimmed --b2 0.65 --cores 12 --log-path dataset1_inc_log 
 ```
 
-### C. Summary stats
-
-You can get summary stats from your aligned dataset.
-
-```
-python /public/uce/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_gbtrimmed --input-format nexus --cores 12 --log-path dataset1_log
-```
-
-If working with an incomplete matrix:
-
-```
-python /public/uce/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_inc_min_75percent_gbtrimmed --input-format nexus --cores 12 --log-path dataset1_inc_log
-```
-
-### D. Screen alignments
-
-Screen alignments for bases that are not in the set of IUPAC base codes.
-
-```
-python /public/uce/phyluce/bin/align/screen_alignments_for_problems.py --alignments dataset1_gbtrimmed --input-format nexus --output dataset1_screened  --cores 12 --log-path dataset1_log
-```
-
-change output to .nex  (changed code so you don't have to do this)
-
-If working with an incomplete matrix:
-
-```
-python /public/uce/phyluce/bin/align/screen_alignments_for_problems.py --alignments dataset1_inc_min_75percent_gbtrimmed --input-format nexus --output dataset1_inc_min_75percent_screened  --cores 12 --log-path dataset1_inc_log
-```
-
-### E. Remove loci names from the taxon names
+### C. Remove loci names from the taxon names
 
 After inspecting individual alignments, remove loci names from the taxon names in
 the nexus files.
 
 ```
-python /public/uce/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_screened --output dataset1_renamed --cores 12 --log-path dataset1_log
+python /public/uce/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_gbtrimmed --output dataset1_renamed --cores 12 --log-path dataset1_log
 ```
 
 OR (IF YOU NEED TO CONVERT TO SHORTER NAMES):
 
 ```
-python /public/uce/phyluce/bin/align/rename_taxa_from_nexus_lines.py --taxa 71 --alignment dataset1_screened --output dataset1_renamed --cores 12 --log-path dataset1_log
+python /public/uce/phyluce/bin/align/rename_taxa_from_nexus_lines.py --taxa 71 --alignment dataset1_gbtrimmed --output dataset1_renamed --cores 12 --log-path dataset1_log
 ```
 
 If working with an incomplete matrix:
 
 ```
-python /public/uce/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_inc_min_75percent_screened --output dataset1_inc_min_75percent_renamed --cores 12 --log-path dataset1_inc_log
+python /public/uce/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_inc_min_75percent_gbtrimmed --output dataset1_inc_min_75percent_renamed --cores 12 --log-path dataset1_inc_log
+```
+
+### D. Summary stats
+
+You can get summary stats from your aligned dataset.
+
+```
+python /public/uce/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_renamed --input-format nexus --cores 12 --log-path dataset1_log
+```
+
+If working with an incomplete matrix:
+
+```
+python /public/uce/phyluce/bin/align/get_align_summary_data.py --alignments dataset1_inc_min_75percent_renamed --input-format nexus --cores 12 --log-path dataset1_inc_log
 ```
 
 ## STEP 8 - Formatting data for phylogenetic analysis
