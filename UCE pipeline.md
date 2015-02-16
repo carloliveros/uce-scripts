@@ -215,6 +215,13 @@ match_contigs_to_probes.py /public/uce/work/cleaned-reads/contigs /public/uce/wo
 python /public/uce/phyluce/bin/assembly/match_contigs_to_probes.py --contigs trinity_assemblies/contigs/ --probes 5k-probes.fasta  --dupefile 5k-probes-to-self.fasta --output ./lastz/ --regex "(chr\w+)(?:_probe\d+)"
 ```
 
+To convert log into tab delimited text file:
+
+```
+cat path-to/match_contigs_to_probes.log |grep 'dupe probe matches' | sed -r 's/.+ - INFO - //' | sed -r 's/: /\t/' | sed -r 's/ \(/\t/' |sed -r 's/\) uniques of /\t/' |sed -r 's/ contigs, /\t/' |sed -r 's/ dupe probe matches, /\t/' | sed -r 's/ UCE loci removed for matching multiple contigs, /\t/' |sed -r 's/ contigs removed for matching multiple UCE loci//' > contig.summary.txt
+```
+
+
 ## STEP 4 - Inspect data using sqlite
 
 See Brant's github page for more details.  It's all there!
