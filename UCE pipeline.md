@@ -491,7 +491,7 @@ For a complete matrix:
 #PBS -m abe
 #PBS -d /scratch/username/dataset1
 #PBS -j oe
-#PBS -o /scratch/username/dataset1/dataset1.cf.gt.out
+#PBS -o /dev/null
 unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/username/dataset1/dataset1_phylip/ /scratch/username/dataset1/dataset1_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/username/dataset1/dataset1.cf.gt.out
 ```
 
@@ -504,7 +504,7 @@ For an incomplete matrix:
 #PBS -m abe
 #PBS -d /scratch/username/dataset1
 #PBS -j oe
-#PBS -o /scratch/username/dataset1/dataset1.cf.gt.out
+#PBS -o /dev/null
 unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/username/dataset1/dataset1_inc_min_75percent_phylip/ /scratch/username/dataset1/dataset1_inc_min_75percent_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/username/dataset1/dataset1.cf.gt.out
 ```
 
