@@ -1,18 +1,12 @@
-# Species tree analysis pipeline
+# Summary species tree analysis
 
 ### by Carl H. Oliveros
 
-Perform the following steps in a working directory such as /scratch/oliveros/dataset1/dataset1_speciestree.
+Perform the following steps in a working directory such as /scratch/username/dataset1/dataset1_speciestree.
 
 ## 1. Prepare bootstrap replicates
 
-Split output from Cloudforest.
-
-```
-split --lines=1933 --suffix-length=3 -d 500-bootreps.tre boot
-```
-
-The --lines argument contains the number of loci in your dataset.  500-bootreps.tre should contain all the genetrees from the bootstrapped data, i.e.,  assuming your dataset has L loci and N bootstrap replicates, the file should contain:
+This step assumes that you have gene trees estimated from 500 bootstrap replicates of the data saved in a file called 500-bootreps.tre.  If your dataset has L loci and N bootstrap replicates, the file should contain:
 
 ```
 genetree_from_locus1_of_bootstrap1
@@ -32,7 +26,14 @@ genetree_from_locus2_of_bootstrapN
 genetree_from_locusL_of_bootstrapN
 ```
 
-The above command will split this big file into boot000, boot001, ... bootN-1, each with a set of L genetrees.
+Split and rename bootstrap replicates.
+
+```
+split --lines=1933 --suffix-length=3 -d 500-bootreps.tre boot
+```
+
+The --lines argument contains the number of loci in your dataset.  
+The above command will split this big file (500-bootreps.tre) into boot000, boot001, ... bootN-1, each with a set of L genetrees.
 
 ## 2. Clean up phylip trees and root them
 
@@ -85,9 +86,9 @@ The following R script creates cleaning/rooting job scripts for the cluster.
 
 ```
 numbers<-seq(from=0,to=480,by=20)  #indicate start, end, and interval here
-dir<-"/scratch/oliveros/dataset1/dataset1_speciestree"
+dir<-"/scratch/username/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=48:00:00
-#PBS -M oliveros@ku.edu
+#PBS -M username@ku.edu
 #PBS -r n
 #PBS -m n
 #PBS -j oe"
@@ -122,7 +123,7 @@ The following R script creates R scripts to infer the STAR and STEAC trees for e
 numboot<-500  # number of bootstrap replicates
 increment<-1   # increment
 outgroup<-"GenSpe"  # outgroup taxon
-wd<-"/scratch/oliveros/dataset1/dataset1_speciestree"  # working directory
+wd<-"/scratch/username/dataset1/dataset1_speciestree"  # working directory
 
 start<-0
 end<-increment - 1
@@ -171,9 +172,9 @@ The following R script creates job scripts to run the STAR/STEAC R scripts on th
 ```
 numbers<-seq(from=0,to=499,by=1)  #indicate start, end, and interval here
 
-dir<-"/scratch/oliveros/dataset1/dataset1_speciestree"
+dir<-"/scratch/username/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=48:00:00
-#PBS -M oliveros@ku.edu
+#PBS -M username@ku.edu
 #PBS -r n
 #PBS -m n
 #PBS -j oe"
@@ -205,9 +206,9 @@ The following R script creates ASTRAL job scripts for the cluster.  Make sure yo
 interval<-50  #indicate interval here
 numbers<-seq(from=0,to=450,by=interval)  #indicate start, end here
 astralcom<-"unbuffer java -jar /scratch/oliveros/Astral/astral.4.4.0.jar"
-dir<-"/scratch/oliveros/dataset1/dataset1_speciestree"
+dir<-"/scratch/username/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=25000m,walltime=96:00:00
-#PBS -M oliveros@ku.edu
+#PBS -M username@ku.edu
 #PBS -m n
 #PBS -r n
 #PBS -j oe
@@ -290,9 +291,9 @@ The following R script creates MP-EST job script files for the cluster.
 interval<-1  #indicate interval here
 numbers<-seq(from=0,to=499,by=interval)  #indicate start, end here
 #numbers<-c(9,28,89,109,129,189,248,288,308,348,369,468,489)
-dir<-"/scratch/oliveros/dataset1/dataset1_speciestree"
+dir<-"/scratch/username/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=96:00:00
-#PBS -M oliveros@ku.edu
+#PBS -M username@ku.edu
 #PBS -r n
 #PBS -m n
 #PBS -j oe"
@@ -400,13 +401,6 @@ steac<-steac.sptree(treesrooted, speciesname, taxaname, species.structure, outgr
 write.table(steac,"genetrees.steac.tre",row.names=F,col.names=F,quote=F,append=TRUE)
 ```
 
-ASTRAL and MPEST need to be run from the command line.
-
-```
-java -jar /public/uce/Astral/astral.4.4.0.jar -i genetrees.phy -o genetrees.astral.tre 2>&1 | tee genetrees.phy.astral.out
-
-mpest control
-```
 
 ## Miscellaneous stuff
 
