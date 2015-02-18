@@ -443,7 +443,7 @@ python /public/uce/phyluce/bin/align/format_nexus_files_for_raxml.py --alignment
 
 ### B. Cloudforest
 
-If you wish to perform concatenated analysis (e.g. MrBayes) on an unpartitioned dataset, skip section B and proceed to the MrBayes section.  However, if you wish to perform concatenated analysis on a partitioned dataset (partitioned by model), then perform step B1 before going to the MrBayes section.  I have found that running Cloudforest on the cluster is way faster.
+You will need to run Cloudforest if you wish to perform concatenated analysis on a partitioned dataset (partitioned by model or by locus), then perform step B1 before going to the MrBayes section.  I have found that running Cloudforest on the cluster is way faster.
 
 #### B1. Estimating gene trees
 
@@ -457,30 +457,17 @@ First, convert the dataset into strict phylip format.
 python /public/uce/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_renamed/ --output dataset1_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_log
 ```
 
-Note: If you do not specify --shorten-names, program will take first 10 characters of name.  Consider using `rename_taxa_from_nexus_lines.py`
-
 If working with an incomplete matrix:
 
 ```
 python /public/uce/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_inc_min_75percent_renamed/ --output dataset1_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_inc_log
 ```
 
-Next, estimate gene trees and best fitting substitution models using CloudForest.
+Note: If you do not specify --shorten-names, program will take the first 10 characters of the taxon name.  The python module above requires that the shortened names be unique for each individual.  Consider using `rename_taxa_from_nexus_lines.py` (ask from Carl) if names are not unique.
 
-```
-mkdir dataset1_cloudforest
-python ~/CloudForest/cloudforest/cloudforest_mpi.py dataset1_phylip/ dataset1_cloudforest/ genetrees /usr/bin/phyml --parallelism multiprocessing --cores 12 2>&1 | tee dataset1_cloudforest/genetrees.out
+Next, copy the folder containing alignments in strict phylip format into a working directory such as /scratch/username/dataset1 on the KU cluster.  Then, create the output directory (`/scratch/username/dataset1/dataset1_cloudforest or /scratch/username/dataset1_inc_min_75percent_cloudforest`) in the same working directory
 
-```
-
-If working with an incomplete matrix:
-
-```
-mkdir dataset1_inc_min_75percent_cloudforest
-python ~/CloudForest/cloudforest/cloudforest_mpi.py dataset1_inc_min_75percent_phylip/ dataset1_inc_min_75percent_cloudforest/ genetrees /usr/bin/phyml --parallelism multiprocessing --cores 12 2>&1 | tee dataset1_inc_min_75percent_cloudforest/genetrees.out
-```
-
-For doing the above on the cluster, copy your phylip folder on to a working directory such as /scratch/username/dataset1, create the output directory (`/scratch/username/dataset1/dataset1_cloudforest or /scratch/username/dataset1_inc_min_75percent_cloudforest`), then use one of the following PBS scripts:
+We are now ready to run Cloudforest using one of the following PBS scripts:
 
 For a complete matrix:
 
@@ -510,15 +497,9 @@ unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /s
 
 #### B2. Cloudforest bootstrapping
 
-You need to perform this step if you wish to use Cloudforest to estimate genetrees from bootstrapped data.
+You need to perform this step only if you wish to use Cloudforest to estimate genetrees from bootstrapped data.
 
-For bootstrapping with Cloudforest:
-
-```
-python ~/CloudForest-master/cloudforest/cloudforest_mpi2.py dataset1_phylip/ dataset1_cloudforest_bootstrap/ bootstraps /usr/bin/phyml --genetrees dataset1_cloudforest/genetrees.tre --bootreps 500 --parallelism multiprocessing --cores 12 > /dev/null
-```
-
-You can run Cloudforest bootstrapping on the cluster.  I do this by generating bootstrapping job scripts using R in your working directory (/scratch/username/dataset1) and launching all these jobs.  Note that the cloudforest folder containing the genetrees.tre file should be in the working directory.
+Run Cloudforest bootstrapping on the KU cluster.  I do this by generating bootstrapping job scripts using R in your working directory (/scratch/username/dataset1) and launching all these jobs.  When all the jobs finish, I concatenate all resulting gene trees into one big file.  Note that the cloudforest folder containing the genetrees.tre file should be in the working directory.
 
 Create bootstrapping jobs in R:
 
@@ -564,7 +545,9 @@ cat /scratch/username/dataset1/dataset1_cloudforest_bootstrap*/bootrep001 > /scr
 
 ### C. MrBayes
 
-Perform the two steps below to create a MrBayes file with the data partitioned according to the type of best fitting substitution model.
+If you wish to run MrBayes on an unpartitioned dataset, you can convert the RAxML phylip file to nexus using `convert_one_align_to_another.py` and adding a MrBayes block at the end. 
+
+To run MrBayes file with the data partitioned according to the type of best fitting substitution model, perform the two steps below.
 
 First, strip the models from CloudForest output.
 
@@ -589,6 +572,9 @@ If working with an incomplete matrix:
 ```
 python /public/uce/phyluce/bin/align/format_nexus_files_for_mrbayes.py --alignments dataset1_inc_min_75percent_renamed/ --models dataset1.inc.min.75percent.models.txt --output dataset1.inc.min.75percent.mrbayes.nex --unlink
 ```
+
+You can add the --fully-partition flag in the previous step if you wish to create a fully partitioned dataset.
+
 
 ### D. ExaBayes
 
