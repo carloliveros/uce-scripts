@@ -401,6 +401,13 @@ steac<-steac.sptree(treesrooted, speciesname, taxaname, species.structure, outgr
 write.table(steac,"genetrees.steac.tre",row.names=F,col.names=F,quote=F,append=TRUE)
 ```
 
+ASTRAL and MPEST need to be run from the command line.
+
+```
+java -jar /scratch/oliveros/Astral/astral.4.4.0.jar -i genetrees.phy -o genetrees.astral.tre 2>&1 | tee genetrees.phy.astral.out
+
+mpest control
+```
 
 ## Miscellaneous stuff
 
