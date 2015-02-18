@@ -2,7 +2,7 @@
 
 ### by Carl H. Oliveros
 
-Perform the following steps in a working directory such as /scratch/username/dataset1/dataset1_speciestree.
+Perform the following steps on the KU cluster in a working directory such as /scratch/username/dataset1/dataset1_speciestree.
 
 ## 1. Prepare bootstrap replicates
 
