@@ -32,8 +32,7 @@ Split and rename bootstrap replicates.
 split --lines=1933 --suffix-length=3 -d 500-bootreps.tre boot
 ```
 
-The --lines argument contains the number of loci in your dataset.  
-The above command will split this big file (500-bootreps.tre) into boot000, boot001, ... bootN-1, each with a set of L genetrees.
+The --lines argument contains the number of loci in your dataset.  This command will split this big file (500-bootreps.tre) into boot000, boot001, ... bootN-1, each with a set of L genetrees.
 
 ## 2. Clean up phylip trees and root them
 
