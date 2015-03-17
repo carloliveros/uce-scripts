@@ -6,7 +6,7 @@ You can download bird genomes from http://gigadb.org/dataset/101000.  Download t
 
 ### Convert to 2bit format
 
-You will need to unzip the downloaded files then convert them from fasta into 2bit format.
+You will need to unzip the downloaded files then convert them from fasta into 2bit format.  faToTwoBit download is available at http://hgdownload.cse.ucsc.edu/admin/exe/.
 
 ```
 gunzip *.gz
@@ -34,7 +34,7 @@ while read p; do faToTwoBit $p; done < file.txt
 
 ### In silico alignment
 
-Align probe sequences to all genomes.  Specify an sqlite database file, a lastz output file, the probe file, the list of genome scaffolds, and the path to the location of the genomes in 2bit format.
+Align probe sequences to all genomes.  You will need to install bx-python and add the bx-python library to your PYTHONPATH.  Specify an sqlite database file, a lastz output file, the probe file, the list of genome scaffolds, and the path to the location of the genomes in 2bit format.
 
 ```
 python /public/uce/phyluce/bin/align/run_multiple_lastzs_sqlite.py jarvis.sqlite jarvis_lastz uce-5k-probes.fasta --scaffoldlist AcaChl BucRhi ColStr LepDis ManVit MerNub NesNot PicPub --genome-base-path genomes/ --cores 12 --coverage 67 --identity 80
@@ -59,3 +59,5 @@ Slice out fastas from each respective genome
 ```
 python /public/uce/phyluce/bin/share/slice_sequence_from_genomes2.py genomes.conf jarvis_lastz jarvis_1000_flank_fasta --flank=1000 --name-pattern "uce-5k-probes.fasta_v_{}.lastz.clean"
 ```
+
+The fasta files produced can now be used for `match_contigs_to_probes.py`.
