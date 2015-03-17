@@ -40,7 +40,7 @@ Align probe sequences to all genomes.  You will need to install bx-python and ad
 python /public/uce/phyluce/bin/align/run_multiple_lastzs_sqlite.py jarvis.sqlite jarvis_lastz uce-5k-probes.fasta --scaffoldlist AcaChl BucRhi ColStr LepDis ManVit MerNub NesNot PicPub --genome-base-path genomes/ --cores 12 --coverage 67 --identity 80
 ```
 
-Set up a conf file (say, genomes.conf) that contains a mapping of the scaffold names and genome files. 
+Set up a conf file (say, genomes.conf) that contains a mapping of the scaffold names and paths to the genome files. 
 
 ```
 [scaffolds]
