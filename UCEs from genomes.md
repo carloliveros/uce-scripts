@@ -2,7 +2,7 @@ This document explains how you can extract UCE data from genomes from the Jarvis
 
 ### Download genomes
 
-You can download bird genomes from http://gigadb.org/dataset/101000.  Download the assembled scaffolds for the relevant species.
+You can download bird genomes from http://gigadb.org/dataset/101000.  Download the assembled scaffolds in fasta format for the species of interest.
 
 ### Convert to 2bit format
 
