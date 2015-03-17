@@ -1,4 +1,4 @@
-This document explains how you can extract UCE data from genomes from the Jarvis et al. 2014 Science paper.  The python scripts are in the working branch of https://github.com/faircloth-lab/phyluce.
+This document explains how you can extract UCE data from genomes from the Jarvis et al. 2014 Science paper.  The python scripts are in the working branch of https://github.com/faircloth-lab/phyluce.  Thanks to Brant Faircloth (http://faircloth-lab.org/) for the advice!
 
 ### Download genomes
 
@@ -34,7 +34,7 @@ while read p; do faToTwoBit $p; done < file.txt
 
 ### In silico alignment
 
-Align probe sequences to all genomes.  You will need to install bx-python and add the bx-python library to your PYTHONPATH.  Specify an sqlite database file, a lastz output file, the probe file, the list of genome scaffolds, and the path to the location of the genomes in 2bit format.
+Align probe sequences to all genomes.  You will need to install bx-python and add the bx-python library to your PYTHONPATH.  Specify an sqlite database file, a lastz output directory, the probe file, the list of genome scaffolds, and the path to the location of the genomes in 2bit format.  You will need to create the lastz output directory before running the python script.
 
 ```
 python /public/uce/phyluce/bin/align/run_multiple_lastzs_sqlite.py jarvis.sqlite jarvis_lastz uce-5k-probes.fasta --scaffoldlist AcaChl BucRhi ColStr LepDis ManVit MerNub NesNot PicPub --genome-base-path genomes/ --cores 12 --coverage 67 --identity 80
@@ -54,7 +54,7 @@ NesNot:genomes/NesNot.2bit
 PicPub:genomes/PicPub.2bit
 ```
 
-Slice out fastas from each respective genome.
+Slice out fastas from each respective genome with the following script:
 
 ```
 python /public/uce/phyluce/bin/share/slice_sequence_from_genomes2.py genomes.conf jarvis_lastz jarvis_1000_flank_fasta --flank=1000 --name-pattern "uce-5k-probes.fasta_v_{}.lastz.clean"
