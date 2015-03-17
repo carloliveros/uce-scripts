@@ -114,9 +114,9 @@ for i in dataset1.root.???; do qsub $i; done
 
 Wait for all cleaning/rooting jobs to finish before running any of the analyses below.  It's ok to get them set up while waiting for the jobs to finish.
 
-## 3. STAR and STEAC
+## 3. STAR, STEAC, NJst
 
-The following R script creates R scripts to infer the STAR and STEAC trees for each set of gene trees.  Specify the outgroup name in the script.
+The following R script creates R scripts to infer the STAR, STEAC and NJst trees for each set of gene trees.  Specify the outgroup name in the script.
 
 ```
 numboot<-500  # number of bootstrap replicates
@@ -129,10 +129,11 @@ end<-increment - 1
 
 while (end < numboot)
 {
-	fname<-paste("starsteac",sprintf("%03d",start),".R",sep="")
+	fname<-paste("starsteacnjst",sprintf("%03d",start),".R",sep="")
 	phybase<-'library("phybase")'
 	workdir<-paste('setwd("',wd,'")',sep="")
 	readtree<-paste('mytrees<-read.tree(paste("boot", sprintf("%03d",',start,'), ".rooted", sep=""))',sep="")
+	importnjst<-'source("/scratch/oliveros/NJst.R")'
 	details<-'taxaname<-mytrees[[1]]$tip.label
 speciesname<-taxaname
 ntaxa<-length(taxaname)
@@ -158,15 +159,27 @@ ngene<-length(mytrees)'
 	\tsteac<-steac.sptree(trees, speciesname, taxaname, species.structure, outgroup=outgrouptaxon,method="nj")
 	\tsteacfname<-paste("boot",sprintf("%03d",i),".steac.tre", sep="")
 	\twrite.table(steac,steacfname,row.names=F,col.names=F,quote=F,append=FALSE)
+	
+	\tgenetreefname<-paste("boot", sprintf("%03d",i), ".phy", sep="")
+	\ttreestring<-read.tree.string(genetreefname,format="phylip")
+	\ttrees<-treestring$tree
+	
+	\tspecies.structure<-matrix(0,ncol=ntaxa,nrow=ntaxa)
+	\tdiag(species.structure)<-1
+	\tprint(paste("Estimating NJst tree for", genetreefname))
+	\tnjsttree<-NJst(trees, speciesname, taxaname, species.structure)
+	\tnjstfname<-paste("boot",sprintf("%03d",i),".njst.tre", sep="")
+	\twrite.table(njsttree,njstfname,row.names=F,col.names=F,quote=F,append=FALSE)
+
 }'
-	a<-paste(phybase,workdir,readtree,details,outg1,outg2,forloop,script,sep="\n")
+	a<-paste(phybase,workdir,readtree,importnjst,details,outg1,outg2,forloop,script,sep="\n")
 	write.table(a,fname, row.names=F,col.names=F,quote=F)
 	start<-start + increment
 	end<-end + increment
 }
 ```
 
-The following R script creates job scripts to run the STAR/STEAC R scripts on the cluster.
+The following R script creates job scripts to run the STAR/STEAC/NJst R scripts on the cluster.
 
 ```
 numbers<-seq(from=0,to=499,by=1)  #indicate start, end, and interval here
@@ -180,12 +193,12 @@ pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=48:00:00
 
 for(i in numbers)
 {
-	runfile<-paste("dataset1.stst.",sprintf("%03d",i),sep="")
+	runfile<-paste("dataset1.ssn.",sprintf("%03d",i),sep="")
 	pbsn<-paste("#PBS -N",runfile)
 	pbsd<-paste("#PBS -d",dir)
 	pbso<-paste("#PBS -o ",dir,"/",runfile,".out",sep="")
-	starsteacfile<-paste("starsteac",sprintf("%03d",i),".R",sep="")
-	command<-paste("R --vanilla <",starsteacfile)
+	ssnfile<-paste("starsteacnjst",sprintf("%03d",i),".R",sep="")
+	command<-paste("R --vanilla <",ssnfile)
 	a<-paste(pbsn,pbs,pbsd,pbso,command,sep="\n")
 	write.table(a,runfile, row.names=F,col.names=F,quote=F)
 }
