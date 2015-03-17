@@ -1,4 +1,4 @@
-This document explains how you can extract UCE data from genomes from the Jarvis et al. 2014 Science paper.
+This document explains how you can extract UCE data from genomes from the Jarvis et al. 2014 Science paper.  The python scripts are in the working branch of https://github.com/faircloth-lab/phyluce.
 
 ### Download genomes
 
@@ -54,7 +54,7 @@ NesNot:genomes/NesNot.2bit
 PicPub:genomes/PicPub.2bit
 ```
 
-Slice out fastas from each respective genome
+Slice out fastas from each respective genome.
 
 ```
 python /public/uce/phyluce/bin/share/slice_sequence_from_genomes2.py genomes.conf jarvis_lastz jarvis_1000_flank_fasta --flank=1000 --name-pattern "uce-5k-probes.fasta_v_{}.lastz.clean"
