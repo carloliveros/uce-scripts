@@ -366,8 +366,10 @@ The following R script performs Steps 2 and 3 above on the original data.  Run t
 
 ```
 outgrouptaxon<-"GenSpe"  # indicate outgroup name here
+source("/public/uce/NJst.R")  # indicate path of NJst R code
 
 library("phybase")
+
 # clean up phylip file
 temp<-read.tree(file="genetrees.tre")  
 write.tree(temp,file="genetrees.phy")
@@ -386,31 +388,41 @@ for(k in 1:ngenetree)
 }
 write.tree.string(d,format="phylip",file="genetrees.rooted")	
 
-#STAR, STEAC
+#STAR, STEAC, NJst
 
 mytrees<-read.tree("genetrees.rooted")
 taxaname<-mytrees[[1]]$tip.label
 speciesname<-taxaname
 ntaxa<-length(taxaname)
 ngene<-length(mytrees)
-
 print(paste("Outgroup taxon", outgrouptaxon))
-
-treestringphy<-read.tree.string("genetrees.phy",format="phylip")
-treesphy<-treestringphy$tree
-species.structure<-matrix(0,ncol=ntaxa,nrow=ntaxa)
-diag(species.structure)<-1
-print("Estimating STAR tree")
-star<-star.sptree(treesphy, speciesname, taxaname, species.structure, outgroup=outgrouptaxon,method="nj")
-write.table(star,"genetrees.star.tre",row.names=F,col.names=F,quote=F,append=TRUE)
 
 treestringrooted<-read.tree.string("genetrees.rooted",format="phylip")
 treesrooted<-treestringrooted$tree
+
+# STAR
+species.structure<-matrix(0,ncol=ntaxa,nrow=ntaxa)
+diag(species.structure)<-1
+print("Estimating STAR tree")
+star<-star.sptree(treesrooted, speciesname, taxaname, species.structure, outgroup=outgrouptaxon,method="nj")
+write.table(star,"genetrees.star.tre",row.names=F,col.names=F,quote=F,append=TRUE)
+
+# STEAC
 species.structure<-matrix(0,ncol=ntaxa,nrow=ntaxa)
 diag(species.structure)<-1
 print("Estimating STEAC tree")
 steac<-steac.sptree(treesrooted, speciesname, taxaname, species.structure, outgroup=outgrouptaxon,method="nj")
 write.table(steac,"genetrees.steac.tre",row.names=F,col.names=F,quote=F,append=TRUE)
+
+# NJst
+treestringphy<-read.tree.string("genetrees.phy",format="phylip")
+treesphy<-treestringphy$tree
+species.structure<-matrix(0,ncol=ntaxa,nrow=ntaxa)
+diag(species.structure)<-1
+print("Estimating NJst tree")
+njsttree<-NJst(treesphy, speciesname, taxaname, species.structure)
+write.table(njsttree,"genetrees.njst.tre",row.names=F,col.names=F,quote=F,append=TRUE)
+
 ```
 
 ASTRAL and MPEST need to be run from the command line.
