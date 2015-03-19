@@ -207,7 +207,7 @@ for(i in numbers)
 To submit jobs to cluster:
 
 ```
-for i in dataset1.stst.???; do qsub $i; done
+for i in dataset1.ssn.???; do qsub $i; done
 ```
 
 ## 4. ASTRAL
