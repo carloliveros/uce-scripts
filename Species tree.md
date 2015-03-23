@@ -467,7 +467,7 @@ Getting frequencies of splits with Dendropy from the Python interpreter
 
 ```
 import dendropy
-trees=dendropy.TreeList()
+trees=dendropy.TreeList.get_from_path('genetrees.phy','newick')
 split_leaves = ['ZosMad', 'ZosEry', 'ZosGri']
 f = trees.frequency_of_split(labels=split_leaves)
 print('Frequency of split %s: %s' % (split_leaves, f))
