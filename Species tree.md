@@ -266,7 +266,7 @@ cat `ls *.astral.out` | grep "Optimal tree" | sed -e 's/Optimal tree inferred in
 
 Create MPEST Control Files
 
-Here's how you can create a species-allele table from Astral output from the command line:
+Here's how you can create a species-allele table from Astral output from the command line.  This assumes that you have only one allele per species:
 
 ```
 cat boot000.phy.astral.out |grep "Taxa" |sed 's/Taxa: //'|sed -r 's/(\w+)/\1 1 \1\n/g' |sed 's/, //' | tr '[]' '\n'
