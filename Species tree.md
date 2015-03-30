@@ -425,7 +425,7 @@ write.table(njsttree,"genetrees.njst.tre",row.names=F,col.names=F,quote=F,append
 
 ```
 
-ASTRAL and MPEST need to be run from the command line.
+ASTRAL and MPEST need to be run from the command line.  See MPEST documentation or steps above on how to create an MPEST control file.
 
 ```
 java -jar /scratch/oliveros/Astral/astral.4.4.0.jar -i genetrees.phy -o genetrees.astral.tre 2>&1 | tee genetrees.phy.astral.out
