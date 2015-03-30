@@ -336,19 +336,26 @@ Submit MP-EST jobs to cluster:
 for iter in dataset1.mpest.*; do qsub $iter; done
 ```
 
-Collect all MP-EST trees
+To summarize the results of MP-EST analysis, you need to create a tree file in nexus format that contains the MP-EST trees from the different bootstrap replicates.  First, collect all MP-EST trees
 
 ```
 cat boot???.rooted.tre | grep "tree mpest" > summary
 ```
 
-Create nexus file with all trees
+Next, copy the nexus header (up until begin trees line) of one MP-EST output and paste it on to a file named zhead.  'x' below is usually the number of taxa plus 4. 
+
+```
+head -x boot000.rooted.tre > zhead
+```
+
+Create a text file named ztail that contains a single line with 'end;'.
+
+Now, create a nexus file with all trees
 
 ```
 cat zhead summary ztail > mpest.500.tre
 ```
 
-Note:  Make zhead and ztail from nexus headers and tail of each output file.
 
 Collect MP-EST run times
 
