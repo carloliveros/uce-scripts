@@ -495,6 +495,8 @@ For an incomplete matrix:
 unbuffer python /scratch/oliveros/CloudForest/cloudforest/cloudforest_mpi2.py /scratch/username/dataset1/dataset1_inc_min_75percent_phylip/ /scratch/username/dataset1/dataset1_inc_min_75percent_cloudforest/ genetrees /tools/cluster/6.2/cloudforest/0.1/bin/phyml --parallelism multiprocessing --cores 20 > /scratch/username/dataset1/dataset1.cf.gt.out
 ```
 
+At this point, you can run summary species tree analyses on the inferred gene trees (see instructions in Step 6 of Species tree scripts).
+
 #### B2. Cloudforest bootstrapping
 
 You need to perform this step only if you wish to use Cloudforest to estimate genetrees from bootstrapped data.
