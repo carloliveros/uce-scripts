@@ -399,12 +399,6 @@ the nexus files.
 python /public/uce/phyluce/bin/align/remove_locus_name_from_nexus_lines.py --taxa 71 --alignment dataset1_gbtrimmed --output dataset1_renamed --cores 12 --log-path dataset1_log
 ```
 
-OR (IF YOU NEED TO CONVERT TO SHORTER NAMES):
-
-```
-python /public/uce/phyluce/bin/align/rename_taxa_from_nexus_lines.py --taxa 71 --alignment dataset1_gbtrimmed --output dataset1_renamed --cores 12 --log-path dataset1_log
-```
-
 If working with an incomplete matrix:
 
 ```
@@ -463,7 +457,7 @@ If working with an incomplete matrix:
 python /public/uce/phyluce/bin/align/convert_one_align_to_another.py --alignment dataset1_inc_min_75percent_renamed/ --output dataset1_inc_min_75percent_phylip/ --input-format nexus --output-format phylip --cores 12 --shorten-names --log-path dataset1_inc_log
 ```
 
-Note: If you do not specify --shorten-names, program will take the first 10 characters of the taxon name.  The python module above requires that the shortened names be unique for each individual.  Consider using `rename_taxa_from_nexus_lines.py` (ask from Carl) if names are not unique.
+Note: If you do not specify --shorten-names, program will take the first 10 characters of the taxon name.  The python module above requires that the shortened names be unique for each individual.  Consider using the --name-conf flag if you wish to provide a config file with full name:short name mappings.
 
 Next, copy the folder containing alignments in strict phylip format into a working directory such as /scratch/username/dataset1 on the KU cluster.  Then, create the output directory (`/scratch/username/dataset1/dataset1_cloudforest or /scratch/username/dataset1_inc_min_75percent_cloudforest`) in the same working directory
 
