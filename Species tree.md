@@ -312,7 +312,7 @@ pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=5000m,walltime=96:00:00
 
 for(i in numbers)
 {
-	runfile<-paste("dataset1.mpest.",sprintf("%03d",i),sep="")
+	runfile<-paste("dataset1.mp.",sprintf("%03d",i),sep="")
 
 	pbsn<-paste("#PBS -N",runfile)
 	pbsd<-paste("#PBS -d",dir)
@@ -333,7 +333,7 @@ for(i in numbers)
 Submit MP-EST jobs to cluster:
 
 ```
-for iter in dataset1.mpest.*; do qsub $iter; done
+for iter in dataset1.mp.*; do qsub $iter; done
 ```
 
 To summarize the results of MP-EST analysis, you need to create a tree file in nexus format that contains the MP-EST trees from the different bootstrap replicates.  First, collect all MP-EST trees
