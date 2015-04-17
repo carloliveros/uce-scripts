@@ -217,7 +217,7 @@ The following R script creates ASTRAL job scripts for the cluster.  Make sure yo
 ```
 interval<-50  #indicate interval here
 numbers<-seq(from=0,to=450,by=interval)  #indicate start, end here
-astralcom<-"unbuffer java -jar /scratch/oliveros/Astral/astral.4.4.0.jar"
+astralcom<-"unbuffer java -jar /scratch/oliveros/Astral.4.7.7/astral.4.7.7.jar"
 dir<-"/scratch/username/dataset1/dataset1_speciestree"
 pbs<-"#PBS -l nodes=1:ppn=1:avx,mem=25000m,walltime=96:00:00
 #PBS -M username@ku.edu
@@ -435,7 +435,7 @@ write.table(njsttree,"genetrees.njst.tre",row.names=F,col.names=F,quote=F,append
 ASTRAL and MPEST need to be run from the command line.  See MPEST documentation or steps above on how to create an MPEST control file.
 
 ```
-java -jar /scratch/oliveros/Astral/astral.4.4.0.jar -i genetrees.phy -o genetrees.astral.tre 2>&1 | tee genetrees.phy.astral.out
+java -jar /scratch/oliveros/Astral.4.7.7/astral.4.7.7.jar -i genetrees.phy -o genetrees.astral.tre 2>&1 | tee genetrees.phy.astral.out
 
 mpest control
 ```
