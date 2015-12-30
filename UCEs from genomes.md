@@ -37,7 +37,16 @@ while read p; do faToTwoBit $p; done < file.txt
 Align probe sequences to all genomes.  You will need to install bx-python and add the bx-python library to your PYTHONPATH.  Specify an sqlite database file, a lastz output directory, the probe file, the list of genome scaffolds, and the path to the location of the genomes in 2bit format.  You will need to create the lastz output directory before running the python script.
 
 ```
-python /public/uce/phyluce/bin/align/run_multiple_lastzs_sqlite.py jarvis.sqlite jarvis_lastz uce-5k-probes.fasta --scaffoldlist AcaChl BucRhi ColStr LepDis ManVit MerNub NesNot PicPub --genome-base-path genomes/ --cores 12 --coverage 67 --identity 80
+phyluce_probe_run_multiple_lastzs_sqlite \
+    --db jarvis.sqlite \
+    --output jarvis_lastz \
+    --probefile uce-5k-probes.fasta \
+    --scaffoldlist AcaChl BucRhi ColStr LepDis ManVit MerNub NesNot PicPub \
+    --no-dir \
+    --genome-base-path avian-genomes/ \
+    --cores 12 \
+    --coverage 67 \
+    --identity 80
 ```
 
 Set up a conf file (say, genomes.conf) that contains a mapping of the scaffold names and paths to the genome files. 
@@ -57,7 +66,12 @@ PicPub:genomes/PicPub.2bit
 Slice out fastas from each respective genome with the following script:
 
 ```
-python /public/uce/phyluce/bin/share/slice_sequence_from_genomes2.py genomes.conf jarvis_lastz jarvis_1000_flank_fasta --flank=1000 --name-pattern "uce-5k-probes.fasta_v_{}.lastz.clean"
+python ~/phyluce/bin/probes/phyluce_probe_slice_sequence_from_genomes \
+    --conf genomes.conf \
+    --lastz jarvis_lastz \
+    --output jarvis_1000_flank_fasta \
+    --name-pattern "uce-5k-probes.fasta_v_{}.lastz.clean" \
+    --flank 1000
 ```
 
 The fasta files produced can now be used for `match_contigs_to_probes.py`.
