@@ -34,7 +34,7 @@ while read p; do faToTwoBit $p; done < file.txt
 
 ### In silico alignment
 
-Align probe sequences to all genomes.  You will need to install bx-python and add the bx-python library to your PYTHONPATH.  Specify an sqlite database file, a lastz output directory, the probe file, the list of genome scaffolds, and the path to the location of the genomes in 2bit format.  You will need to create the lastz output directory before running the python script.
+Align probe sequences to all genomes.  You will need to install bx-python and add the bx-python library to your PYTHONPATH.  Specify an sqlite database file, a lastz output directory, the probe file, the list of genome scaffolds, and the path to the location of the genomes in 2bit format.  You will need to create the lastz output directory before running the python script.  You can also change the coverage and identity values to make the matching more or less stringent.
 
 ```
 phyluce_probe_run_multiple_lastzs_sqlite \
@@ -42,11 +42,11 @@ phyluce_probe_run_multiple_lastzs_sqlite \
     --output jarvis_lastz \
     --probefile uce-5k-probes.fasta \
     --scaffoldlist AcaChl BucRhi ColStr LepDis ManVit MerNub NesNot PicPub \
-    --no-dir \
     --genome-base-path avian-genomes/ \
-    --cores 12 \
-    --coverage 67 \
-    --identity 80
+    --no-dir \
+    --coverage 83 \
+    --identity 92.5 \
+    --cores 12
 ```
 
 Set up a conf file (say, genomes.conf) that contains a mapping of the scaffold names and paths to the genome files. 
@@ -63,7 +63,7 @@ NesNot:genomes/NesNot.2bit
 PicPub:genomes/PicPub.2bit
 ```
 
-Slice out fastas from each respective genome with the following script:
+Slice out fastas from each respective genome with the script below.  Adjust the size of flanking regions to include using the flank parameter.
 
 ```
 python ~/phyluce/bin/probes/phyluce_probe_slice_sequence_from_genomes \
